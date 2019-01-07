@@ -1,7 +1,7 @@
 import pytest
 
-from umfrage.users.forms import UserCreationForm
-from umfrage.users.tests.factories import UserFactory
+from core.users.forms import UserCreationForm
+from core.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 

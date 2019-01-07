@@ -1,6 +1,6 @@
 from django.urls import path
 
-from umfrage.users.views import (
+from core.users.views import (
     user_list_view,
     user_redirect_view,
     user_update_view,

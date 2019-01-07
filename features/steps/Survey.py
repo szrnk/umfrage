@@ -1,7 +1,7 @@
 from behave import *
 
 from surveys.models import Survey
-from umfrage.users.tests.factories import AdminFactory
+from core.users.tests.factories import AdminFactory
 from django.conf import settings
 
 

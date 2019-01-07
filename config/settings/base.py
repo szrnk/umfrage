@@ -4,8 +4,8 @@ Base settings to build other settings files upon.
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (umfrage/config/settings/base.py - 3 = umfrage/)
-APPS_DIR = ROOT_DIR.path('umfrage')
+ROOT_DIR = environ.Path(__file__) - 3  # (core/config/settings/base.py - 3 = core/)
+APPS_DIR = ROOT_DIR.path('core')
 
 env = environ.Env()
 
@@ -70,7 +70,7 @@ THIRD_PARTY_APPS = [
     'rest_framework',
 ]
 LOCAL_APPS = [
-    'umfrage.users.apps.UsersAppConfig',
+    'core.users.apps.UsersAppConfig',
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -80,7 +80,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
 MIGRATION_MODULES = {
-    'sites': 'umfrage.contrib.sites.migrations'
+    'sites': 'core.contrib.sites.migrations'
 }
 
 # AUTHENTICATION
@@ -242,9 +242,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = 'umfrage.users.adapters.AccountAdapter'
+ACCOUNT_ADAPTER = 'core.users.adapters.AccountAdapter'
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = 'umfrage.users.adapters.SocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'core.users.adapters.SocialAccountAdapter'
 
 
 # Your stuff...

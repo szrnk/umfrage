@@ -334,7 +334,7 @@ pip-selfcheck.json
 
 ### Project template
 
-umfrage/media/
+core/media/
 
 .pytest_cache/
 
