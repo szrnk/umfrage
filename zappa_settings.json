@@ -1,0 +1,12 @@
+{
+    "dev": {
+        "aws_region": "eu-west-1",
+        "django_settings": "config.settings.zappadev",
+        "profile_name": "default",
+        "project_name": "umfrage",
+        "runtime": "python3.6",
+        "s3_bucket": "zappa-hari-umfrage-dev",
+        "slim_handler": true,
+        "use_precompiled_packages": true
+    }
+}

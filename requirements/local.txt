@@ -24,6 +24,7 @@ coverage==4.5.2  # https://github.com/nedbat/coveragepy
 # Django
 # ------------------------------------------------------------------------------
 factory-boy==2.11.1  # https://github.com/FactoryBoy/factory_boy
+zappa-django-utils==0.4.0
 
 django-debug-toolbar==1.11  # https://github.com/jazzband/django-debug-toolbar
 django-extensions==2.1.4  # https://github.com/django-extensions/django-extensions

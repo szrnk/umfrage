@@ -1,2 +1,5 @@
 export DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/umfrage
 python manage.py migrate
+
+
+zappa manage dev create_admin_user <UNAME> <EMAIL> <PASS>

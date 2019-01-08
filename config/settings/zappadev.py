@@ -1,18 +1,31 @@
+import os
 from .base import *  # noqa
 from .base import env
+
+# zappa specific
+# ==============
+
+# prefetch the environment variables - must be defined in lambda console
+ZAPPA_DEBUG = os.environ['ZAPPA_DEBUG']
+ZAPPA_GATEWAY_HOST = os.environ['ZAPPA_GATEWAY_HOST']
+ZAPPA_SQLITE_BUCKET = os.environ['ZAPPA_SQLITE_BUCKET']
+ZAPPA_SECRET_KEY = os.environ['ZAPPA_SECRET_KEY']
+
 
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = True
+DEBUG = ZAPPA_DEBUG
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = env('DJANGO_SECRET_KEY', default='GHDtO7VWZsT2ZNhXKUhB8MxgEX88sviv8bKqgPoCe0gwhBNtYLi0BrFjirekGDwP')
+SECRET_KEY = ZAPPA_SECRET_KEY
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = [
     "localhost",
     "0.0.0.0",
     "127.0.0.1",
 ]
+ALLOWED_HOSTS += [ZAPPA_GATEWAY_HOST]
+
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -67,3 +80,16 @@ INSTALLED_APPS += ['behave_django']  # noqa F405
 INSTALLED_APPS += ['surveys']  # noqa F405
 INSTALLED_APPS += ['zappa_django_utils']
 
+
+# zappa specific
+# ==============
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'zappa_django_utils.db.backends.s3sqlite',
+        'NAME': 'sqlite.db',
+        'BUCKET': ZAPPA_SQLITE_BUCKET
+    }
+}
+
+DATABASES['default']['ATOMIC_REQUESTS'] = True
