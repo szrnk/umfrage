@@ -1,9 +1,9 @@
 pytz==2018.7  # https://github.com/stub42/pytz
 python-slugify==2.0.0  # https://github.com/un33k/python-slugify
 Pillow==5.3.0  # https://github.com/python-pillow/Pillow
-argon2-cffi==18.3.0  # https://github.com/hynek/argon2_cffi
+argon2-cffi==18.1.0  # https://github.com/hynek/argon2_cffi
 redis>=2.10.6, < 3  # pyup: < 3 # https://github.com/antirez/redis
-selenium==3.141.0  # https://semaphoreci.com/community/tutorials/setting-up-a-bdd-stack-on-a-django-application 
+selenium==3.141.0  # https://semaphoreci.com/community/tutorials/setting-up-a-bdd-stack-on-a-django-application
 
 # Django
 # ------------------------------------------------------------------------------
