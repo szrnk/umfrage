@@ -1,6 +1,12 @@
 <h1>{{ survey.name }}</h1>
 <ul>
-{#{% for choice in survey.choice_set.all %}#}
-{#    <li>{{ choice.choice_text }}</li>#}
-{#{% endfor %}#}
+{% for question in view.questions %}
+    <li>{{ question.text }}
+        <ul>
+        {% for option in question.options %}
+            <li>{{ option.text }}</li>
+        {% endfor %}
+        </ul>
+    </li>
+{% endfor %}
 </ul>
