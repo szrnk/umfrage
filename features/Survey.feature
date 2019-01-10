@@ -10,7 +10,5 @@ Feature: Surveys
     Then I am returned to the surveys page
     And I see one survey row
     And The title of the survey is "survey1"
-    #And I see the current version of the survey
-
 
 
