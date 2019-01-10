@@ -4,6 +4,7 @@ from django.db import models
 class Hospital(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
+    address_detail = models.CharField(max_length=50, blank=True)
     city = models.CharField(max_length=60)
     state_province = models.CharField(max_length=30)
     country = models.CharField(max_length=50)
@@ -21,6 +22,7 @@ class Department(models.Model):
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
+    address_detail = models.CharField(max_length=50, blank=True)
     city = models.CharField(max_length=60)
     state_province = models.CharField(max_length=30)
     country = models.CharField(max_length=50)
