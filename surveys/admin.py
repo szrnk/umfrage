@@ -20,7 +20,7 @@ class QuestionAdmin(admin.ModelAdmin):
     extra = 0
 
 
-class QuestionInline(admin.StackedInline):
+class QuestionInline(SortableInlineAdminMixin, admin.StackedInline):
     model = Question
     extra = 0
 

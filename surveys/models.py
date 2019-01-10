@@ -26,6 +26,7 @@ class Question(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     code = models.CharField(max_length=40)
     text = models.TextField()
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     def options(self):
         return Option.objects.filter(question_id=self.pk)
@@ -37,7 +38,8 @@ class Question(models.Model):
         return self.text[:30]
 
     class Meta:
-        ordering = ["code"]
+        # order must be first
+        ordering = ["order"]
 
     def __str__(self):
         return self.text[:20]
