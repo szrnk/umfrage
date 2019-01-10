@@ -5,9 +5,36 @@ from django.contrib.sites.models import Site
 
 from .models import Survey, Question, Option
 
+
+class OptionInline(admin.StackedInline):
+    model = Option
+    extra = 0
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [
+        OptionInline,
+    ]
+    list_display = ('code', 'truncated_text', 'number_of_options')
+    extra = 0
+
+
+class QuestionInline(admin.StackedInline):
+    model = Question
+    extra = 0
+
+
+class SurveyAdmin(admin.ModelAdmin):
+    inlines = [
+        QuestionInline,
+    ]
+    list_display = ('name', 'number_of_questions')
+    extra = 0
+
+
 admin.site.register(Option)
-admin.site.register(Question)
-admin.site.register(Survey)
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Survey, SurveyAdmin)
 
 # TODO: We want a better place to put these...
 admin.site.unregister(Group)

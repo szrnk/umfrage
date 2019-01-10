@@ -15,6 +15,12 @@ class Survey(models.Model):
     def __str__(self):
         return self.name
 
+    def questions(self):
+        return Question.objects.filter(survey_id=self.pk)
+
+    def number_of_questions(self):
+        return len(self.questions())
+
 
 class Question(models.Model):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
@@ -23,6 +29,12 @@ class Question(models.Model):
 
     def options(self):
         return Option.objects.filter(question_id=self.pk)
+
+    def number_of_options(self):
+        return len(self.options())
+
+    def truncated_text(self):
+        return self.text[:30]
 
     class Meta:
         ordering = ["code"]
