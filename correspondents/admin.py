@@ -13,7 +13,7 @@ class DepartmentInline(admin.StackedInline):
                        )
         }),
     )
-    extra = 1
+    extra = 0
 
 
 class HospitalAdmin(admin.ModelAdmin):
@@ -30,7 +30,7 @@ class HospitalAdmin(admin.ModelAdmin):
         #     'fields': ('registration_required', 'template_name'),
         # }),
     )
-    extra = 1
+    extra = 0
 
 
 class DepartmentAdmin(admin.ModelAdmin):
