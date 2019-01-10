@@ -47,9 +47,11 @@ class Option(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     code = models.CharField(max_length=20)
     text = models.TextField()
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     class Meta:
-        ordering = ["code"]
+        # order must be first
+        ordering = ["order"]
 
     def __str__(self):
         return self.text[:20]

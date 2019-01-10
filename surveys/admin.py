@@ -1,3 +1,4 @@
+from adminsortable2.admin import SortableInlineAdminMixin
 from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
 from django.contrib import admin
 from django.contrib.auth.models import Group
@@ -6,7 +7,7 @@ from django.contrib.sites.models import Site
 from .models import Survey, Question, Option
 
 
-class OptionInline(admin.StackedInline):
+class OptionInline(SortableInlineAdminMixin, admin.StackedInline):
     model = Option
     extra = 0
 
