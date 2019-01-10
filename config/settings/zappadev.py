@@ -77,7 +77,7 @@ INSTALLED_APPS += ['behave_django']  # noqa F405
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ['surveys']  # noqa F405
+INSTALLED_APPS += ['surveys', 'correspondents']  # noqa F405
 INSTALLED_APPS += ['zappa_django_utils']
 
 
