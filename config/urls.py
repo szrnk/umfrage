@@ -21,8 +21,8 @@ urlpatterns = [
     ),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
-    path('surveys/', include('surveys.urls')),
-    path('correspondents/', include('correspondents.urls')),
+    path('surveys/', include('surveys.urls', namespace="surveys")),
+    path('correspondents/', include('correspondents.urls', namespace="correspondents")),
     ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
     )
