@@ -115,7 +115,7 @@ AWS_S3_OBJECT_PARAMETERS = {
 
 STATICFILES_STORAGE = 'django_s3_storage.storage.StaticS3Storage'
 STATIC_URL = f'https://{AWS_S3_BUCKET_NAME}.s3.amazonaws.com/static/'
-AWS_S3_BUCKET_AUTH_STATIC = True
+AWS_S3_BUCKET_AUTH_STATIC = False
 
 
 # MEDIA
