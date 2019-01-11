@@ -15,3 +15,7 @@ zappa manage dev create_admin_user <UNAME> <EMAIL> <PASS>
 zappa manage dev "collectstatic --noinput"
 
 
+## Run once after adding sortable Mixin
+python manage.py reorder surveys.Option surveys.Question
+zappa manage reorder surveys.Option surveys.Question
+
