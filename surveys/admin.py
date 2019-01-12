@@ -13,7 +13,7 @@ from .models import Survey, Question, Option
 
 FORMFIELD_OVERRIDES = {
     models.TextField: {'widget': Textarea(
-        attrs={'rows': 6,
+        attrs={'rows': 5,
                # 'cols': 60,
                'class': 'vLargeTextField',
                })},
@@ -25,7 +25,7 @@ class EditLinkToParentSurvey(object):
         if instance.pk:
             url = reverse('admin:%s_%s_change' % (
                 instance._meta.app_label, instance.survey._meta.model_name), args=[instance.survey.pk])
-            return mark_safe(u'<a href="{u}">edit containing survey</a>'.format(u=url))
+            return mark_safe(u'<a href="{u}">edit parent survey</a>'.format(u=url))
         else:
             return ''
 
@@ -33,9 +33,10 @@ class EditLinkToParentSurvey(object):
 class EditLinkToInlineObject(object):
     def edit_link(self, instance):
         if instance.pk:
+            model_name = instance._meta.model_name
             url = reverse('admin:%s_%s_change' % (
-                instance._meta.app_label, instance._meta.model_name), args=[instance.pk])
-            return mark_safe(u'<a href="{u}">edit details</a>'.format(u=url))
+                instance._meta.app_label, model_name), args=[instance.pk])
+            return mark_safe(u'<a href="{u}">edit {m} details</a>'.format(u=url, m=model_name))
         else:
             return ''
 
