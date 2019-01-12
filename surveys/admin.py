@@ -20,6 +20,16 @@ FORMFIELD_OVERRIDES = {
 }
 
 
+class EditLinkToParentSurvey(object):
+    def survey_edit_link(self, instance):
+        if instance.pk:
+            url = reverse('admin:%s_%s_change' % (
+                instance._meta.app_label, instance.survey._meta.model_name), args=[instance.survey.pk])
+            return mark_safe(u'<a href="{u}">edit containing survey</a>'.format(u=url))
+        else:
+            return ''
+
+
 class EditLinkToInlineObject(object):
     def edit_link(self, instance):
         if instance.pk:
@@ -41,17 +51,17 @@ class OptionInline(SortableInlineAdminMixin, admin.StackedInline):
     extra = 0
 
 
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionAdmin(EditLinkToParentSurvey, admin.ModelAdmin):
     inlines = [
         OptionInline,
     ]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ('code', 'truncated_text', 'number_of_options')
-    exclude = ('order', )
-    readonly_fields = ('survey', )
+    # exclude = ('order', )
+    readonly_fields = ('survey', 'survey_edit_link')
     fieldsets = (
         (None, {
-            'fields': ('survey', 'code', 'text',)
+            'fields': ('survey', 'survey_edit_link', 'code', 'text',)
         }),)
     extra = 0
 
@@ -59,11 +69,8 @@ class QuestionAdmin(admin.ModelAdmin):
 class QuestionInline(SortableInlineAdminMixin, EditLinkToInlineObject, admin.StackedInline):
     model = Question
     extra = 0
+    exclude = ('code', )
     readonly_fields = ('edit_link', )
-    fieldsets = (
-        (None, {
-            'fields': (('edit_link',), ('text',))
-        }),)
     formfield_overrides = FORMFIELD_OVERRIDES
 
 
