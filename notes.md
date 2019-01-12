@@ -19,3 +19,7 @@ zappa manage dev "collectstatic --noinput"
 python manage.py reorder surveys.Option surveys.Question
 zappa manage reorder surveys.Option surveys.Question
 
+# References
+https://en.wikipedia.org/wiki/Questionnaire
+https://en.wikipedia.org/wiki/Questionnaire_construction
+http://www.mrxplorer.com/index.php/2017/02/06/6-common-survey-writing-errors-to-avoid/
