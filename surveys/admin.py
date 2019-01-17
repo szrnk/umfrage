@@ -9,7 +9,7 @@ from django.urls import reverse
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
 
-from .models import Survey, Question, Option
+from .models import Survey, Section, Question, Option
 
 FORMFIELD_OVERRIDES = {
     models.TextField: {'widget': Textarea(
@@ -18,6 +18,16 @@ FORMFIELD_OVERRIDES = {
                'class': 'vLargeTextField',
                })},
 }
+
+
+class EditLinkToParentSection(object):
+    def section_edit_link(self, instance):
+        if instance.pk:
+            url = reverse('admin:%s_%s_change' % (
+                instance._meta.app_label, instance.section._meta.model_name), args=[instance.section.pk])
+            return mark_safe(u'<a href="{u}">edit parent section</a>'.format(u=url))
+        else:
+            return ''
 
 
 class EditLinkToParentSurvey(object):
@@ -52,17 +62,17 @@ class OptionInline(SortableInlineAdminMixin, admin.StackedInline):
     extra = 0
 
 
-class QuestionAdmin(EditLinkToParentSurvey, admin.ModelAdmin):
+class QuestionAdmin(EditLinkToParentSection, admin.ModelAdmin):
     inlines = [
         OptionInline,
     ]
     formfield_overrides = FORMFIELD_OVERRIDES
-    list_display = ('code', 'truncated_text', 'number_of_options')
+    list_display = ('code', 'truncated_text', )
     # exclude = ('order', )
-    readonly_fields = ('survey', 'survey_edit_link')
+    readonly_fields = ('section', 'section_edit_link')
     fieldsets = (
         (None, {
-            'fields': ('survey', 'survey_edit_link', 'code', 'text',)
+            'fields': ('section', 'section_edit_link', 'code', 'text',)
         }),)
     extra = 0
 
@@ -75,14 +85,37 @@ class QuestionInline(SortableInlineAdminMixin, EditLinkToInlineObject, admin.Sta
     formfield_overrides = FORMFIELD_OVERRIDES
 
 
+class SectionAdmin(EditLinkToParentSurvey, admin.ModelAdmin):
+    inlines = [
+        QuestionInline,
+    ]
+    formfield_overrides = FORMFIELD_OVERRIDES
+    list_display = ('name', )
+    readonly_fields = ('survey', 'survey_edit_link')
+    fieldsets = (
+        (None, {
+            'fields': ('survey', 'survey_edit_link', 'name', 'title')
+        }),)
+    extra = 0
+
+
+class SectionInline(SortableInlineAdminMixin, EditLinkToInlineObject, admin.StackedInline):
+    model = Section
+    extra = 0
+    exclude = ('code', )
+    readonly_fields = ('edit_link', )
+    formfield_overrides = FORMFIELD_OVERRIDES
+
+
 class SurveyAdmin(admin.ModelAdmin):
-    inlines = (QuestionInline, )
-    list_display = ('name', 'number_of_questions')
+    inlines = (SectionInline, )
+    list_display = ('name', )
     extra = 0
 
 
 admin.site.register(Option, OptionAdmin)
 admin.site.register(Question, QuestionAdmin)
+admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
 
 # TODO: We want a better place to put these...

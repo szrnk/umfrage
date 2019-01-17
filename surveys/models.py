@@ -15,21 +15,40 @@ class Survey(models.Model):
     def __str__(self):
         return self.name
 
+    def sections(self):
+        return self.section_set.all()
+
+
+class Section(models.Model):
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    # Name is for the survey developer only
+    name = models.CharField(max_length=100)
+    # Title is used on frontend - and to be internationalised
+    title = models.CharField(max_length=100, blank=False)
+    order = models.PositiveIntegerField(default=0, blank=False, null=False)
+
+    class Meta:
+        # order must be first
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.name
+
     def questions(self):
-        return Question.objects.filter(survey_id=self.pk)
+        return self.question_set.all();
 
     def number_of_questions(self):
         return len(self.questions())
 
 
 class Question(models.Model):
-    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
     code = models.CharField(max_length=40)
     text = models.TextField()
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     def options(self):
-        return Option.objects.filter(question_id=self.pk)
+        return self.option_set.all()
 
     def number_of_options(self):
         return len(self.options())
@@ -42,7 +61,7 @@ class Question(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return self.text[:20]
+        return self.text[:40]
 
 
 class Option(models.Model):

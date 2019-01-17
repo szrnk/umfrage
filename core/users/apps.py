@@ -12,7 +12,7 @@ def migrated__add_admins_callback(sender, **kwargs):
         except User.DoesNotExist:
             User.objects.create_superuser(username, email, password)
 
-    create_or_skip('russ', 'russ.ferriday@gmail.com', 'boldmove')
+    create_or_skip('russ', 'russ.ferriday@gmail.com', 'russ')
     create_or_skip('monika', 'harito@haritomedia.com', 'boldmove')
 
 
