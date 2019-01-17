@@ -23,3 +23,8 @@ zappa manage reorder surveys.Option surveys.Question
 https://en.wikipedia.org/wiki/Questionnaire
 https://en.wikipedia.org/wiki/Questionnaire_construction
 http://www.mrxplorer.com/index.php/2017/02/06/6-common-survey-writing-errors-to-avoid/
+https://www.surveymonkey.com/curiosity/using-skip-logic-means-better-data-heres-proof/
+https://getsitecontrol.com/howto/survey-widget/how-use-branching-logic-survey/
+https://www.zoho.com/survey/help/branching-and-logic.html
+https://help.surveygizmo.com/help/setup-question-logic
+https://help.surveygizmo.com/help/set-up-skip-logic
