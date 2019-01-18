@@ -39,19 +39,6 @@ def step_impl(context):
     # did we make it?
     assert br.current_url.endswith('/accounts/confirm-email/')
 
-    br.get(context.base_url + '/users/admin/')
-    br.get(context.base_url + '/users/admin/')
-
-    # from django.contrib.sessions.backends.db import SessionStore
-    # from django.contrib.auth import BACKEND_SESSION_KEY, SESSION_KEY, get_user_model
-    #
-    # session = SessionStore()
-    # session[SESSION_KEY] = u.pk  # 1
-    # session[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
-    # session.save()
-
-    pass
-
 
 @when("I login to admin ui")
 def step_impl(context):
