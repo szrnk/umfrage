@@ -42,10 +42,17 @@ class OptionFactory(DjangoModelFactory):
         model = Option
 
 
-def basic_structure():
+def basic_survey_structure(surveyname=None):
+    # allow a one-shot survey name
+    if surveyname is not None:
+        survey_kwargs = dict(name=surveyname)
+    else:
+        survey_kwargs = dict()
+
     surveys = []
     for sui in range(2):
-        su = SurveyFactory()
+        su = SurveyFactory(**survey_kwargs)
+        survey_kwargs = dict()
         for sei in range(4):
             se = SectionFactory(survey=su)
             for qui in range(4):

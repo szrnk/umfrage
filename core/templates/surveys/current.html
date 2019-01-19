@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <h2>Survey: {{ survey.name }}</h2>
+  <ul>
+  {% for section in survey.sections %}
+    <li>{{ section.title }}
+    <ul>
+    {% for question in section.questions %}
+      <li>{{ question.text }}
+        <ul>
+          {% for option in question.options %}
+            <li>{{ option.text }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+    </ul>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock content %}

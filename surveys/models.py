@@ -1,4 +1,8 @@
 from django.db import models
+from django.urls import reverse
+from django.utils.crypto import get_random_string
+
+from correspondents.models import Department
 
 
 class Survey(models.Model):
@@ -72,3 +76,18 @@ class Option(models.Model):
     def __str__(self):
         return self.text[:20]
 
+
+def generate_random_token():
+    return get_random_string(length=32)
+
+
+class Invitation(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    token = models.CharField(max_length=32, default=generate_random_token)
+
+    def __str__(self):
+        return f'Invited {self.department.name} to {self.survey.name}'
+
+    def get_url(self):
+        return reverse("surveys:invite", kwargs={"token": self.token})
