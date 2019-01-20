@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
+from django.utils.text import Truncator
 
 from correspondents.models import Department
 
@@ -60,7 +61,7 @@ class Question(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return self.text[:40]
+        return Truncator(self.text).chars(self._meta.get_field('text').max_length)
 
 
 class Option(models.Model):
