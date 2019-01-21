@@ -113,14 +113,14 @@ class SurveyAdmin(admin.ModelAdmin):
     extra = 0
 
 
-def get_i_url(obj):
+def get_invitation_url(obj):
     return mark_safe(u'<a href="{u}">set as current survey</a>'.format(u=obj.get_url()))
 
 
 class InvitationAdmin(admin.ModelAdmin):
-    list_display = ('department', 'survey', get_i_url)
+    list_display = ('department', 'survey', get_invitation_url)
     extra = 0
-    readonly_fields = (get_i_url, )
+    readonly_fields = (get_invitation_url,)
 
 
 admin.site.register(Option, OptionAdmin)

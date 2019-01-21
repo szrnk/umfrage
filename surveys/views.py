@@ -45,3 +45,10 @@ class CurrentSurveyView(generic.DetailView):
         survey = get_object_or_404(Survey, pk=survey_id)
         return survey
 
+
+class MySurveysView(generic.ListView):
+    template_name = 'surveys/mysurveys.html'
+
+    def get_queryset(self):
+        return self.request.user.surveys.all()
+

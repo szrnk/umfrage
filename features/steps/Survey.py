@@ -214,7 +214,7 @@ def step_impl(context):
     assert 'survey_id' in decoded
 
 
-@step('I can see the survey "{surveyname}" in my browser')
+@step('I can see the survey "{surveyname}" in my browser on the current survey page')
 def step_impl(context, surveyname):
     """
     :type context: behave.runner.Context
@@ -223,3 +223,12 @@ def step_impl(context, surveyname):
     br.get(context.base_url + '/surveys/current/')
     assert surveyname in br.find_elements_by_tag_name('h2')[0].text
 
+
+@step('I can see the survey "{surveyname}" in my "{username}" user page list of surveys')
+def step_impl(context, surveyname, username):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    br.get(context.base_url + f'/surveys/mysurveys/')
+    assert surveyname in br.find_elements_by_xpath("//ul[@id='surveys_list']/li")[0].text

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <h2>My Surveys:</h2>
+  <ul id="surveys_list">
+  {% for survey in object_list %}
+    <li>{{ survey.name }}</li>
+  {% endfor %}
+  </ul>
+{% endblock content %}

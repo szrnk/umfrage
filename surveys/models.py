@@ -4,6 +4,7 @@ from django.utils.crypto import get_random_string
 from django.utils.text import Truncator
 
 from correspondents.models import Department
+from .managers import QuestionQuerySet
 
 
 class Survey(models.Model):
@@ -47,6 +48,8 @@ class Question(models.Model):
     text = models.TextField()
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
+    objects = QuestionQuerySet.as_manager()
+
     def options(self):
         return self.option_set.all()
 
@@ -54,14 +57,14 @@ class Question(models.Model):
         return len(self.options())
 
     def truncated_text(self):
-        return self.text[:30]
+        return Truncator(self.text).chars(30)
 
     class Meta:
         # order must be first
         ordering = ["order"]
 
     def __str__(self):
-        return Truncator(self.text).chars(self._meta.get_field('text').max_length)
+        return self.truncated_text()
 
 
 class Option(models.Model):
@@ -75,7 +78,16 @@ class Option(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return self.text[:20]
+        return Truncator(self.text).chars(20)
+
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    department = models.ForeignKey('correspondents.Department', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'<Answer> option:{self.option} for {self.question} for {self.department}'
 
 
 def generate_random_token():

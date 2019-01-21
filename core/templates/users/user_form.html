@@ -4,7 +4,7 @@
 {% block title %}{{ user.username }}{% endblock %}
 
 {% block content %}
-  <h1>{{ user.username }}</h1>
+  <h2>{{ user.username }}</h2>
   <form class="form-horizontal" method="post" action="{% url 'users:update' %}">
     {% csrf_token %}
     {{ form|crispy }}
@@ -14,4 +14,7 @@
       </div>
     </div>
   </form>
+
+  <h3>Affiliation</h3>
+  {{ user.department }}
 {% endblock %}
