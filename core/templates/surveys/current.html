@@ -1,22 +1,54 @@
 {% extends "base.html" %}
 {% block content %}
 
-  <h2>Survey: {{ survey.name }}</h2>
-  <ul>
-  {% for section in survey.sections %}
-    <li>{{ section.title }}
-    <ul>
-    {% for question in section.questions %}
-      <li>{{ question.text }}
-        <ul>
-          {% for option in question.options %}
-            <li>{{ option.text }}</li>
-          {% endfor %}
-        </ul>
-      </li>
+  <h2>Survey: {{ survey.name }} for Department: {{ department.name }} of {{ department.hospital }}</h2>
+
+  <div id="accordion">
+
+    {% for section in previous_sections %}
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h5 class="mb-0">
+            {{ section }}
+          </h5>
+        </div>
+      </div>
     {% endfor %}
-    </ul>
-    </li>
-  {% endfor %}
-</ul>
+
+      <div class="card">
+      <div class="card-header" id="headingOne">
+        <h5 class="mb-0">
+          {{ this_section }}
+        </h5>
+      </div>
+      <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+        <div class="card-body">
+        {% for this_question in this_section.questions %}
+          {{ this_question.text }}
+          <form>
+            {% for option in this_question.options %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1">
+                <label class="form-check-label" for="exampleRadios1">
+                  {{ option.text }}
+                </label>
+              </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {% for section in future_sections %}
+      <div class="card">
+        <div class="card-header" id="headingOne">
+          <h5 class="mb-0">
+            {{ section }}
+          </h5>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock content %}

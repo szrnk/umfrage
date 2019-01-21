@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 
+from correspondents.models import Department
 from surveys.models import Survey, Section, Invitation
 
 
@@ -49,10 +50,28 @@ class InvitationView(generic.RedirectView):
 class CurrentSurveyView(generic.DetailView):
     template_name = 'surveys/current.html'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.this_section = None
+        self.this_question = None
+
     def get_object(self):
         survey_id = self.request.session.get('survey_id')
         survey = get_object_or_404(Survey, pk=survey_id)
+        self.this_section = survey.section_set.first()
+        self.this_question = survey.section_set.first().question_set.first()
         return survey
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['previous_sections'] = ['Section First', 'Section Second']
+        context['this_section'] = self.this_section
+        context['this_question'] = self.this_question
+        context['future_sections'] = ['Section Later', 'Section Last']
+        department_id = self.request.session.get('department_id')
+        department = get_object_or_404(Department, pk=department_id)
+        context['department'] = department
+        return context
 
 
 class MySurveysView(generic.ListView):
