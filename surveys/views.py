@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.views import generic
 
 from surveys.models import Survey, Section, Invitation
@@ -33,6 +34,14 @@ class InvitationView(generic.RedirectView):
         request.session['department_id'] = invitation.department.id
         request.session['survey_id'] = invitation.survey.id
         request.session['invitation_token'] = token
+        if request.user.is_authenticated:
+            user = request.user
+            user.department_id = invitation.department.id
+            user.surveys.add(invitation.survey)
+
+            messages.add_message(request, messages.INFO, f'Your current Survey and Department are now:: '
+                                 f'Survey: {invitation.survey}, Department: {invitation.department}')
+            return HttpResponseRedirect(reverse('surveys:current'))
         messages.add_message(request, messages.INFO, 'Thank you for coming. Please login, or create a new login.')
         return HttpResponseRedirect('/accounts/login')
 
@@ -51,4 +60,3 @@ class MySurveysView(generic.ListView):
 
     def get_queryset(self):
         return self.request.user.surveys.all()
-
