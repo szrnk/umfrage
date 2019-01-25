@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+  <h2>My Invitations:</h2>
+  <ul id="invitations_list">
+  {% for invitation in object_list %}
+    <li>{{ invitation.survey.name }} --
+      Responding on behalf of {{ invitation.department.name }} of {{ invitation.department.hospital.name }}
+      <br><a href="{{ invitation.get_url }}">Answer the survey now</a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock content %}

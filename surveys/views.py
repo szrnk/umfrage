@@ -42,11 +42,13 @@ class InvitationView(generic.RedirectView):
         request.session['invitation_token'] = token
         if request.user.is_authenticated:
             user = request.user
-            user.department_id = invitation.department.id
             user.surveys.add(invitation.survey)
+            user.invitations.add(invitation)
+            # TODO consider dropping from user
+            user.department_id = invitation.department.id
 
             messages.add_message(request, messages.INFO, f'Your current Survey and Department are now:: '
-            f'Survey: {invitation.survey}, Department: {invitation.department}')
+                                 f'Survey: {invitation.survey}, Department: {invitation.department}')
             return HttpResponseRedirect(reverse('surveys:current'))
         messages.add_message(request, messages.INFO, 'Thank you for coming. Please login, or create a new login.')
         return HttpResponseRedirect('/accounts/login')
@@ -59,9 +61,9 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.progress = None
+        self.object = None
 
     def get_success_url(self):
-        pass
         # TODO: branch at end of survey
         return reverse('surveys:current')
 
@@ -84,15 +86,6 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
         department_id = self.request.session.get('department_id')
         department = get_object_or_404(Department, pk=department_id)
         context['department'] = department
-
-        # section_index = self.progress.get_data()[str(survey.id)]['section_index']
-        # section = survey.sections()[section_index]
-        # question_index = self.progress.get_data()[str(survey.id)]['question_index']
-        # question = section.question_set.all()[question_index]
-
-        # form = FlexiForm(question=question)
-        # context['form'] = form
-
         context['progress'] = self.progress.get_data()[str(survey.id)]
         return context
 
@@ -110,11 +103,11 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
         question = section.question_set.all()[question_index]
         kwargs['question'] = question
         kwargs['department'] = department
+        kwargs['survey'] = survey
         return kwargs
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
@@ -126,41 +119,48 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
         return super(CurrentSurveyView, self).form_valid(form)
 
 
-def post_current(request):
-    survey_id = request.session.get('survey_id')
-    progress = request.session.get('progress')
-    survey = get_object_or_404(Survey, pk=survey_id)
-    department_id = request.session['department_id']
-    department = Department.objects.filter(id=department_id).first()
+# def post_current(request):
+#     survey_id = request.session.get('survey_id')
+#     progress = request.session.get('progress')
+#     survey = get_object_or_404(Survey, pk=survey_id)
+#     department_id = request.session['department_id']
+#     department = Department.objects.filter(id=department_id).first()
+#
+#     # TODO refac
+#     section_index = progress[str(survey.id)]['section_index']
+#     section = survey.sections()[section_index]
+#     question_index = progress[str(survey.id)]['question_index']
+#     question = section.question_set.all()[question_index]
+#
+#     #TODO: check the user is in the department of the invite
+#
+#     if request.method == "POST":
+#         form = FlexiForm(request.POST, question=question)
+#         if form.is_valid():
+#             option = Option.objects.filter(id=form.cleaned_data['option']).first()
+#
+#             earlier = Answer.objects.filter(question_id=question.pk, department_id=department.pk).first()
+#             if earlier:
+#                 earlier.delete()
+#
+#             Answer.objects.create(question=question, department=department, option=option)
+#
+#             Progress(request, survey).advance(request)
+#
+#             return HttpResponseRedirect(reverse('surveys:current'))
+#         # else:
+#         #     form = FlexiForm(question=question)
+#
+#         return render(request, 'surveys/current.html', {'form': form, 'survey': survey, 'department': department})
+#     else:
+#         return HttpResponseRedirect(reverse('surveys:current'))
 
-    # TODO refac
-    section_index = progress[str(survey.id)]['section_index']
-    section = survey.sections()[section_index]
-    question_index = progress[str(survey.id)]['question_index']
-    question = section.question_set.all()[question_index]
 
-    #TODO: check the user is in the department of the invite
+class MyInvitationsView(generic.ListView):
+    template_name = 'surveys/myinvitations.html'
 
-    if request.method == "POST":
-        form = FlexiForm(request.POST, question=question)
-        if form.is_valid():
-            option = Option.objects.filter(id=form.cleaned_data['option']).first()
-
-            earlier = Answer.objects.filter(question_id=question.pk, department_id=department.pk).first()
-            if earlier:
-                earlier.delete()
-
-            Answer.objects.create(question=question, department=department, option=option)
-
-            Progress(request, survey).advance(request)
-
-            return HttpResponseRedirect(reverse('surveys:current'))
-        # else:
-        #     form = FlexiForm(question=question)
-
-        return render(request, 'surveys/current.html', {'form': form, 'survey': survey, 'department': department})
-    else:
-        return HttpResponseRedirect(reverse('surveys:current'))
+    def get_queryset(self):
+        return self.request.user.invitations.all()
 
 
 class MySurveysView(generic.ListView):

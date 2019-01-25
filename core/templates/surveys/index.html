@@ -2,9 +2,4 @@
 
 {% block content %}
     <h2>Surveys</h2>
-    <ul>
-        {% for survey in survey_list %}
-            <li><a href="{% url 'surveys:detail' survey.id %}">{{ survey.name }}</a></li>
-        {% endfor %}
-    </ul>
 {% endblock %}
