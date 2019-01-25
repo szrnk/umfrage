@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
+from django.views.generic.edit import FormMixin
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
@@ -51,12 +52,18 @@ class InvitationView(generic.RedirectView):
         return HttpResponseRedirect('/accounts/login')
 
 
-class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
+class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
     template_name = 'surveys/current.html'
+    form_class = FlexiForm
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.progress = None
+
+    def get_success_url(self):
+        pass
+        # TODO: branch at end of survey
+        return reverse('surveys:current')
 
     def get_object(self):
         survey_id = self.request.session.get('survey_id')
@@ -78,16 +85,44 @@ class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
         department = get_object_or_404(Department, pk=department_id)
         context['department'] = department
 
-        section_index = self.progress.get_data()[str(survey.id)]['section_index']
-        section = survey.sections()[section_index]
-        question_index = self.progress.get_data()[str(survey.id)]['question_index']
-        question = section.question_set.all()[question_index]
+        # section_index = self.progress.get_data()[str(survey.id)]['section_index']
+        # section = survey.sections()[section_index]
+        # question_index = self.progress.get_data()[str(survey.id)]['question_index']
+        # question = section.question_set.all()[question_index]
 
-        form = FlexiForm(question=question)
-        context['form'] = form
+        # form = FlexiForm(question=question)
+        # context['form'] = form
 
         context['progress'] = self.progress.get_data()[str(survey.id)]
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        request = self.request
+        survey_id = request.session.get('survey_id')
+        progress = request.session.get('progress')
+        survey = get_object_or_404(Survey, pk=survey_id)
+        department_id = request.session['department_id']
+        department = Department.objects.filter(id=department_id).first()
+        section_index = progress[str(survey.id)]['section_index']
+        section = survey.sections()[section_index]
+        question_index = progress[str(survey.id)]['question_index']
+        question = section.question_set.all()[question_index]
+        kwargs['question'] = question
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.save(self.request)
+        return super(CurrentSurveyView, self).form_valid(form)
 
 
 def post_current(request):
