@@ -73,6 +73,10 @@ Deployment
 
 The following details how to deploy this application.
 
+zappa update
 
+Test Data
+---------
 
-
+zappa manage dev create_sample_surveys
+zappa manage dev create_basic_hospital_structure Alexandra-Klinic  Accident-Department

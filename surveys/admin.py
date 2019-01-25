@@ -9,7 +9,7 @@ from django.urls import reverse
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
 
-from .models import Survey, Section, Question, Option, Invitation
+from .models import Survey, Section, Question, Option, Invitation, Answer
 
 FORMFIELD_OVERRIDES = {
     models.TextField: {'widget': Textarea(
@@ -123,11 +123,12 @@ class InvitationAdmin(admin.ModelAdmin):
     readonly_fields = (get_invitation_url,)
 
 
+admin.site.register(Answer)
+admin.site.register(Invitation, InvitationAdmin)
 admin.site.register(Option, OptionAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
-admin.site.register(Invitation, InvitationAdmin)
 
 # TODO: We want a better place to put these unregisters...
 admin.site.unregister(Group)

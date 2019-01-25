@@ -1,7 +1,5 @@
-from typing import Any, Sequence
+from factory import DjangoModelFactory, Faker, Sequence
 
-from django.contrib.auth import get_user_model
-from factory import DjangoModelFactory, Faker, post_generation, Sequence
 from ..models import Survey, Section, Question, Option
 
 

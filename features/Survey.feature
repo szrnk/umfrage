@@ -22,8 +22,13 @@ Feature: Surveys
     Then the relevant ids are in my session
     And I can see the survey "My Basic Survey" in my "zina" user page list of surveys
     And I can see the survey "My Basic Survey" in my browser on the current survey page
+    And The session has a progress structure for "My Basic Survey" and both section and question indices are 0
 
-  Scenario: User logs in again and is led through current survey
-    Given there is a basic_survey called "My Basic Survey"
-    And a typical_hospital exists called "Typical Hospital" with department "Emergency Department"
-    And an invitation for "My Basic Survey" has been extended to "Emergency Department" of "Typical Hospital"
+#  Scenario: User logs in again and is led through current survey
+#    Given there is a basic_survey called "My Basic Survey"
+#    And a typical_hospital exists called "Typical Hospital" with department "Emergency Department"
+#    And an invitation for "My Basic Survey" has been extended to "Emergency Department" of "Typical Hospital"
+#    When the survey "My Basic Survey" is visited for the first time
+#    Then the session has a progress structure for "My Basic Survey" and both section and question indices are 0
+
+

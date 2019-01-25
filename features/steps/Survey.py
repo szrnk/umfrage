@@ -230,5 +230,31 @@ def step_impl(context, surveyname, username):
     :type context: behave.runner.Context
     """
     br = context.browser
-    br.get(context.base_url + f'/surveys/mysurveys/')
+    br.get(context.base_url + '/surveys/mysurveys/')
     assert surveyname in br.find_elements_by_xpath("//ul[@id='surveys_list']/li")[0].text
+
+
+@when('the survey "{surveyname}" is visited for the first time')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    br.get(context.base_url + '/surveys/current/')
+    assert surveyname in br.find_elements_by_tag_name('h2')[0].text
+
+
+@then('The session has a progress structure for "{surveyname}" and both section and question indices are 0')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    sess = Session.objects.all().first()
+    decoded = sess.get_decoded()
+    assert 'progress' in decoded
+    progress = decoded['progress']
+    survey = Survey.objects.filter(name=surveyname).first()
+    assert str(survey.id) in progress
+    assert progress[str(survey.id)]['question_index'] == 0
+    assert progress[str(survey.id)]['section_index'] == 0
+
