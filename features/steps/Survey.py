@@ -230,8 +230,8 @@ def step_impl(context, surveyname, username):
     :type context: behave.runner.Context
     """
     br = context.browser
-    br.get(context.base_url + '/surveys/mysurveys/')
-    assert surveyname in br.find_elements_by_xpath("//ul[@id='surveys_list']/li")[0].text
+    br.get(context.base_url + '/surveys/myinvitations/')
+    assert surveyname in br.find_elements_by_xpath("//ul[@id='invitations_list']/li")[0].text
 
 
 @when('the survey "{surveyname}" is visited for the first time')

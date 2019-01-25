@@ -119,55 +119,11 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
         return super(CurrentSurveyView, self).form_valid(form)
 
 
-# def post_current(request):
-#     survey_id = request.session.get('survey_id')
-#     progress = request.session.get('progress')
-#     survey = get_object_or_404(Survey, pk=survey_id)
-#     department_id = request.session['department_id']
-#     department = Department.objects.filter(id=department_id).first()
-#
-#     # TODO refac
-#     section_index = progress[str(survey.id)]['section_index']
-#     section = survey.sections()[section_index]
-#     question_index = progress[str(survey.id)]['question_index']
-#     question = section.question_set.all()[question_index]
-#
-#     #TODO: check the user is in the department of the invite
-#
-#     if request.method == "POST":
-#         form = FlexiForm(request.POST, question=question)
-#         if form.is_valid():
-#             option = Option.objects.filter(id=form.cleaned_data['option']).first()
-#
-#             earlier = Answer.objects.filter(question_id=question.pk, department_id=department.pk).first()
-#             if earlier:
-#                 earlier.delete()
-#
-#             Answer.objects.create(question=question, department=department, option=option)
-#
-#             Progress(request, survey).advance(request)
-#
-#             return HttpResponseRedirect(reverse('surveys:current'))
-#         # else:
-#         #     form = FlexiForm(question=question)
-#
-#         return render(request, 'surveys/current.html', {'form': form, 'survey': survey, 'department': department})
-#     else:
-#         return HttpResponseRedirect(reverse('surveys:current'))
-
-
 class MyInvitationsView(generic.ListView):
     template_name = 'surveys/myinvitations.html'
 
     def get_queryset(self):
-        return self.request.user.invitations.all()
-
-
-class MySurveysView(generic.ListView):
-    template_name = 'surveys/mysurveys.html'
-
-    def get_queryset(self):
-        return self.request.user.surveys.all()
+        return self.request.user.department.invitation_set.all()
 
 
 class SurveySequence(object):
