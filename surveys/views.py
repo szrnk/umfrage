@@ -109,6 +109,7 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
         question_index = progress[str(survey.id)]['question_index']
         question = section.question_set.all()[question_index]
         kwargs['question'] = question
+        kwargs['department'] = department
         return kwargs
 
     def post(self, request, *args, **kwargs):
