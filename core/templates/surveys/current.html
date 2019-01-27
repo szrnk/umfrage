@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load survey_extras %}
 {% block content %}
   {% if not survey %}
 
@@ -13,23 +14,25 @@
     <div id="accordion">
       {% for section in survey.sections %}
         <div class="card">
-          <div class="card-header" id="headingOne">
+          <div class="card-header" id="section_{{ section.id }}">
             <h5 class="mb-0">
-              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true"
+              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="true"
                       aria-controls="collapseOne">
                 {{ section.title }}
               </button>
             </h5>
           </div>
-          <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+          <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}" data-parent="#accordion">
             <div class="card-body">
-              {% if forloop.counter0 == progress.section_index %}
-                <form action="" method="post">
-                  {% csrf_token %}
-                  {{ form.as_p }}
-                  <input type="submit" value="Submit">
-                </form>
-              {% endif %}
+              {% for question in section.questions %}
+                <div id="question_{{ question.id }}">
+                  <form action="" method="post">
+                    {% csrf_token %}
+                    {% get_survey_question_form survey department question %}
+                    <input type="submit" value="Submit">
+                  </form>
+                </div>
+              {% endfor %}
             </div>
           </div>
         </div>

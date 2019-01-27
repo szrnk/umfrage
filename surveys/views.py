@@ -8,7 +8,7 @@ from django.views.generic.edit import FormMixin
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
-from surveys.models import Survey, Section, Invitation, Option, Answer
+from surveys.models import Survey, Section, Invitation, Option, Answer, Question
 
 from .progress import Progress
 
@@ -54,8 +54,9 @@ class InvitationView(generic.RedirectView):
         return HttpResponseRedirect('/accounts/login')
 
 
-class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
+class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
     template_name = 'surveys/current.html'
+    #FormMixin
     form_class = FlexiForm
 
     def __init__(self, **kwargs):
@@ -70,6 +71,7 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
     def get_object(self):
         survey_id = self.request.session.get('survey_id')
         survey = Survey.objects.filter(pk=survey_id).first()
+        self.survey=survey
         if survey is not None:
             # This has the side effect of ensuring session tracking for question and section
             self.progress = Progress(self.request, survey)
@@ -82,29 +84,45 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
             return context
         survey = context['object']
         context['progress'] = self.progress
-
         department_id = self.request.session.get('department_id')
         department = get_object_or_404(Department, pk=department_id)
         context['department'] = department
-        context['progress'] = self.progress.get_data()[str(survey.id)]
+        #context['progress'] = self.progress.get_data()[str(survey.id)]
         return context
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+        #kwargs = super().get_form_kwargs()
+        kwargs = {}
         request = self.request
         survey_id = request.session.get('survey_id')
         progress = request.session.get('progress')
         survey = get_object_or_404(Survey, pk=survey_id)
         department_id = request.session['department_id']
         department = Department.objects.filter(id=department_id).first()
-        section_index = progress[str(survey.id)]['section_index']
-        section = survey.sections()[section_index]
-        question_index = progress[str(survey.id)]['question_index']
-        question = section.question_set.all()[question_index]
+        if 0:
+            section_index = progress[str(survey.id)]['section_index']
+            section = survey.sections()[section_index]
+            question_index = progress[str(survey.id)]['question_index']
+            question = section.question_set.all()[question_index]
+        else:
+            qid = self.request.POST['qid']
+            question = Question.objects.filter(pk=qid).first()
+
         kwargs['question'] = question
         kwargs['department'] = department
         kwargs['survey'] = survey
+
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+
         return kwargs
+
+    def get_form(self):
+        kwargs = self.get_form_kwargs()
+        return FlexiForm(**kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -112,11 +130,16 @@ class CurrentSurveyView(LoginRequiredMixin, FormMixin, generic.DetailView):
         if form.is_valid():
             return self.form_valid(form)
         else:
+            # TODO - find a way to get errors on the question
             return self.form_invalid(form)
 
     def form_valid(self, form):
         form.save(self.request)
-        return super(CurrentSurveyView, self).form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    # def form_invalid(self, form):
+    #     """If the form is invalid, render the invalid form."""
+    #     return self.render_to_response(self.get_context_data(form=form))
 
 
 class MyInvitationsView(generic.ListView):
@@ -125,15 +148,3 @@ class MyInvitationsView(generic.ListView):
     def get_queryset(self):
         return self.request.user.department.invitation_set.all()
 
-
-class SurveySequence(object):
-
-    def __init__(self, survey):
-        self.survey = survey
-        self.sequence = self.build()
-
-    def build(self):
-        ret = []
-        return ret
-        # for section in self.survey.section_set:
-        #     for question in section.question_set:

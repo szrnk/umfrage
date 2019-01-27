@@ -258,3 +258,21 @@ def step_impl(context, surveyname):
     assert progress[str(survey.id)]['question_index'] == 0
     assert progress[str(survey.id)]['section_index'] == 0
 
+
+@step('There is section and question text for each level of "{surveyname}"')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    survey = Survey.objects.filter(name=surveyname).first()
+    for section in survey.sections():
+        ss = br.find_element_by_id(f'section_{section.id}')
+        assert ss.text == section.title
+        for idx, question in enumerate(section.questions()):
+            labels = ss.parent.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//label")
+            question_text = labels[0].text
+            assert question_text == question.text
+            for oidx, option in enumerate(question.options()):
+                option_text = labels[oidx+1].text
+                assert option_text == option.text
