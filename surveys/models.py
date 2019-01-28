@@ -36,7 +36,7 @@ class Section(models.Model):
         return self.name
 
     def questions(self):
-        return self.question_set.all();
+        return self.question_set.all()
 
     def number_of_questions(self):
         return len(self.questions())
@@ -84,10 +84,14 @@ class Option(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     option = models.ForeignKey(Option, on_delete=models.CASCADE)
-    department = models.ForeignKey('correspondents.Department', on_delete=models.CASCADE)
+    department = models.ForeignKey(
+        "correspondents.Department", on_delete=models.CASCADE
+    )
 
     def __str__(self):
-        return f'<Answer> option:{self.option} for {self.question} for {self.department}'
+        return (
+            f"<Answer> option:{self.option} for {self.question} for {self.department}"
+        )
 
 
 def generate_random_token():
@@ -100,7 +104,7 @@ class Invitation(models.Model):
     token = models.CharField(max_length=32, default=generate_random_token)
 
     def __str__(self):
-        return f'Invited {self.department.name} to {self.survey.name}'
+        return f"Invited {self.department.name} to {self.survey.name}"
 
     def get_url(self):
         return reverse("surveys:invite", kwargs={"token": self.token})

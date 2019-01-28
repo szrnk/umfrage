@@ -5,18 +5,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('surveys', '0003_auto_20190110_1231'),
-    ]
+    dependencies = [("surveys", "0003_auto_20190110_1231")]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='option',
-            options={'ordering': ['order']},
-        ),
+        migrations.AlterModelOptions(name="option", options={"ordering": ["order"]}),
         migrations.AddField(
-            model_name='option',
-            name='order',
+            model_name="option",
+            name="order",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

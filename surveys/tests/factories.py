@@ -15,7 +15,7 @@ class SectionFactory(DjangoModelFactory):
 
     survey = SubFactory(SurveyFactory)
     name = Sequence(lambda n: "Section %03d" % n)
-    title = Faker('sentence', nb_words=7)
+    title = Faker("sentence", nb_words=7)
     order = Sequence(lambda n: n)
 
     class Meta:
@@ -25,7 +25,7 @@ class SectionFactory(DjangoModelFactory):
 class QuestionFactory(DjangoModelFactory):
     section = SubFactory(SectionFactory)
     code = Sequence(lambda n: "QCode%03d" % n)
-    text = Faker('sentence', nb_words=30)
+    text = Faker("sentence", nb_words=30)
     order = Sequence(lambda n: n)
 
     class Meta:
@@ -35,7 +35,7 @@ class QuestionFactory(DjangoModelFactory):
 class OptionFactory(DjangoModelFactory):
     question = SubFactory(QuestionFactory)
     code = Sequence(lambda n: "OCode%03d" % n)
-    text = Faker('sentence', nb_words=30)
+    text = Faker("sentence", nb_words=30)
     order = Sequence(lambda n: n)
 
     class Meta:
@@ -75,10 +75,13 @@ def tight_survey_structure(surveyname=None):
         su = SurveyFactory(**survey_kwargs)
         survey_kwargs = dict()
         for sei in range(4):
-            se = SectionFactory(survey=su, title=f'this is section {sei}')
+            se = SectionFactory(survey=su, title=f"this is section {sei}")
             for qui in range(4):
-                qu = QuestionFactory(section=se, text=f'text for question {qui}, with original order {qui}')
+                qu = QuestionFactory(
+                    section=se,
+                    text=f"text for question {qui}, with original order {qui}",
+                )
                 for opi in range(4):
-                    _ = OptionFactory(question=qu, text=f'text for option {opi}')
+                    _ = OptionFactory(question=qu, text=f"text for option {opi}")
         surveys.append(su)
     return surveys

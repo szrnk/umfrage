@@ -6,14 +6,14 @@ import surveys.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('surveys', '0008_invitation'),
-    ]
+    dependencies = [("surveys", "0008_invitation")]
 
     operations = [
         migrations.AddField(
-            model_name='invitation',
-            name='token',
-            field=models.CharField(default=surveys.models.generate_random_token, max_length=32),
-        ),
+            model_name="invitation",
+            name="token",
+            field=models.CharField(
+                default=surveys.models.generate_random_token, max_length=32
+            ),
+        )
     ]

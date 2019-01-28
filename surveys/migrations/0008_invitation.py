@@ -7,17 +7,36 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('correspondents', '0008_auto_20190117_1515'),
-        ('surveys', '0007_auto_20190117_1623'),
+        ("correspondents", "0008_auto_20190117_1515"),
+        ("surveys", "0007_auto_20190117_1623"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Invitation',
+            name="Invitation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='correspondents.Department')),
-                ('survey', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='surveys.Survey')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="correspondents.Department",
+                    ),
+                ),
+                (
+                    "survey",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="surveys.Survey"
+                    ),
+                ),
             ],
-        ),
+        )
     ]

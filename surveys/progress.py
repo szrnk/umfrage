@@ -12,14 +12,19 @@ class Progress(object):
         self.sections = survey.sections()
         self.survey_key = str(survey.id)
         self.initialize_progress_in_session(request, survey)
-        self.current_section = self.sections[self.progress[self.survey_key]['section_index']]
-        #self.progress = None
+        self.current_section = self.sections[
+            self.progress[self.survey_key]["section_index"]
+        ]
+        # self.progress = None
 
     def is_last_section(self):
-        return self.progress[self.survey_key]['section_index'] + 1 >= len(self.sections)
+        return self.progress[self.survey_key]["section_index"] + 1 >= len(self.sections)
 
     def is_end_of_section(self):
-        return self.progress[self.survey_key]['question_index'] + 1 >= self.current_section.question_set.count()
+        return (
+            self.progress[self.survey_key]["question_index"] + 1
+            >= self.current_section.question_set.count()
+        )
 
     def advance(self, request):
         """
@@ -30,14 +35,14 @@ class Progress(object):
             if self.is_last_section():
                 return None  # meaning we are done
             else:
-                self.progress[self.survey_key]['section_index'] += 1
-                self.progress[self.survey_key]['question_index'] = 0
+                self.progress[self.survey_key]["section_index"] += 1
+                self.progress[self.survey_key]["question_index"] = 0
         else:
-            self.progress[self.survey_key]['question_index'] += 1
+            self.progress[self.survey_key]["question_index"] += 1
         self.save(request)
 
     def save(self, request):
-        request.session['progress'] = self.progress
+        request.session["progress"] = self.progress
         pass
 
     def get_data(self):
@@ -56,7 +61,7 @@ class Progress(object):
         write = False
 
         # get/build
-        progress = request.session.get('progress')
+        progress = request.session.get("progress")
         if progress is None:
             progress = dict()
             write = True
@@ -66,15 +71,14 @@ class Progress(object):
             write = True
 
         # ensure all fields present, in case we had a partial session in place
-        if not progress[self.survey_key].get('section_index'):
-            progress[self.survey_key]['section_index'] = 0
+        if not progress[self.survey_key].get("section_index"):
+            progress[self.survey_key]["section_index"] = 0
             write = True
-        if not progress[self.survey_key].get('question_index'):
-            progress[self.survey_key]['question_index'] = 0
+        if not progress[self.survey_key].get("question_index"):
+            progress[self.survey_key]["question_index"] = 0
             write = True
 
         self.progress = progress
 
         if write:
             self.save(request)
-

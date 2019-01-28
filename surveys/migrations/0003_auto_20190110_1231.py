@@ -5,22 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('surveys', '0002_auto_20190109_1614'),
-    ]
+    dependencies = [("surveys", "0002_auto_20190109_1614")]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='option',
-            options={'ordering': ['code']},
-        ),
-        migrations.AlterModelOptions(
-            name='question',
-            options={'ordering': ['code']},
-        ),
+        migrations.AlterModelOptions(name="option", options={"ordering": ["code"]}),
+        migrations.AlterModelOptions(name="question", options={"ordering": ["code"]}),
         migrations.AlterField(
-            model_name='question',
-            name='code',
-            field=models.CharField(max_length=40),
+            model_name="question", name="code", field=models.CharField(max_length=40)
         ),
     ]
