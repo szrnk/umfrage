@@ -259,7 +259,7 @@ def step_impl(context, surveyname):
     assert progress[str(survey.id)]['section_index'] == 0
 
 
-@step('There is section and question text for each level of "{surveyname}"')
+@step('There is section, question, and option text for each level of "{surveyname}"')
 def step_impl(context, surveyname):
     """
     :type context: behave.runner.Context
@@ -276,3 +276,16 @@ def step_impl(context, surveyname):
             for oidx, option in enumerate(question.options()):
                 option_text = labels[oidx+1].text
                 assert option_text == option.text
+
+
+# @step('The final question of "{surveyname}" is multichoice')
+# def step_impl(context, surveyname):
+#     """
+#     :type context: behave.runner.Context
+#     """
+#     br = context.browser
+#     survey = Survey.objects.filter(name=surveyname).first()
+#     section = survey.sections()[-1]
+#     question = section.questions()[-1]
+#     br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+

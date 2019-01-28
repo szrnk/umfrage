@@ -1,4 +1,4 @@
-from factory import DjangoModelFactory, Faker, Sequence
+from factory import DjangoModelFactory, Faker, Sequence, SubFactory
 
 from ..models import Survey, Section, Question, Option
 
@@ -13,6 +13,7 @@ class SurveyFactory(DjangoModelFactory):
 
 class SectionFactory(DjangoModelFactory):
 
+    survey = SubFactory(SurveyFactory)
     name = Sequence(lambda n: "Section %03d" % n)
     title = Faker('sentence', nb_words=7)
     order = Sequence(lambda n: n)
@@ -22,7 +23,7 @@ class SectionFactory(DjangoModelFactory):
 
 
 class QuestionFactory(DjangoModelFactory):
-
+    section = SubFactory(SectionFactory)
     code = Sequence(lambda n: "QCode%03d" % n)
     text = Faker('sentence', nb_words=30)
     order = Sequence(lambda n: n)
@@ -32,7 +33,7 @@ class QuestionFactory(DjangoModelFactory):
 
 
 class OptionFactory(DjangoModelFactory):
-
+    question = SubFactory(QuestionFactory)
     code = Sequence(lambda n: "OCode%03d" % n)
     text = Faker('sentence', nb_words=30)
     order = Sequence(lambda n: n)

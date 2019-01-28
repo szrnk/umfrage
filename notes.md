@@ -28,3 +28,6 @@ https://getsitecontrol.com/howto/survey-widget/how-use-branching-logic-survey/
 https://www.zoho.com/survey/help/branching-and-logic.html
 https://help.surveygizmo.com/help/setup-question-logic
 https://help.surveygizmo.com/help/set-up-skip-logic
+
+## implementation
+https://realpython.com/modeling-polymorphism-django-python/#conclusion
