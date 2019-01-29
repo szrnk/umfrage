@@ -14,6 +14,15 @@ zappa manage dev create_admin_user <UNAME> <EMAIL> <PASS>
 
 zappa manage dev "collectstatic --noinput"
 
+--
+
+ 533  zappa update
+  534  zappa tail 
+  535  zappa manage migrate
+  536  zappa manage dev migrate
+  538  zappa manage dev create_basic_hospital_structure Alexandra-Clinic Emergency-Department
+  539  zappa manage dev create_sample_surveys 
+
 
 ## Run once after adding sortable Mixin
 python manage.py reorder surveys.Option surveys.Question
