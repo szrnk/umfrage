@@ -59,6 +59,15 @@ def basic_survey_structure(surveyname=None):
                 qu = QuestionFactory(section=se)
                 for opi in range(4):
                     _ = OptionFactory(question=qu)
+
+        # Make the last question in the last section a multi, for later tests
+        for section in su.sections():
+            for question in section.questions():
+                pass
+        lastq = question
+        lastq.qtype = 'MULTI'
+        lastq.save()
+
         surveys.append(su)
     return surveys
 
@@ -83,5 +92,14 @@ def tight_survey_structure(surveyname=None):
                 )
                 for opi in range(4):
                     _ = OptionFactory(question=qu, text=f"text for option {opi}")
+
+        # Make the last question in the last section a multi, for later tests
+        for section in su.sections():
+            for question in section.questions():
+                pass
+        lastq = question
+        lastq.qtype = 'MULTI'
+        lastq.save()
+
         surveys.append(su)
     return surveys

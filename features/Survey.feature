@@ -24,4 +24,4 @@ Feature: Surveys
     And I can see the survey "My Basic Survey" in my browser on the current survey page
     And The session has a progress structure for "My Basic Survey" and both section and question indices are 0
     And There is section, question, and option text for each level of "My Basic Survey"
-    #And The final question of "My Basic Survey" is multichoice
+    And The final question of "My Basic Survey" is multichoice

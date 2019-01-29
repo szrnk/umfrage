@@ -42,10 +42,14 @@ class Section(models.Model):
         return len(self.questions())
 
 
+TYPE_CHOICES = (("SINGLE", "Radio"), ("MULTI", "Checkboxes"))
+
+
 class Question(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     code = models.CharField(max_length=40)
     text = models.TextField()
+    qtype = models.CharField(max_length=9, choices=TYPE_CHOICES, default="SINGLE")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     objects = QuestionQuerySet.as_manager()
@@ -83,15 +87,16 @@ class Option(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    options = models.ManyToManyField(Option)
     department = models.ForeignKey(
         "correspondents.Department", on_delete=models.CASCADE
     )
 
     def __str__(self):
-        return (
-            f"<Answer> option:{self.option} for {self.question} for {self.department}"
-        )
+        return f"<Answer {self.id}>"
+
+    # def __repr__(self):
+    #     return f"<Answer {self.pk}> option:{self.option} for {self.question} for {self.department}"
 
 
 def generate_random_token():

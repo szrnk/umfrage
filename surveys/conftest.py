@@ -1,7 +1,8 @@
 import pytest
-from django.conf import settings
 from django.test import RequestFactory
 
+from correspondents.models import Department, Hospital
+from correspondents.tests.factories import DepartmentFactory, HospitalFactory
 from surveys.models import Question, Survey, Option
 from surveys.tests.factories import QuestionFactory, SurveyFactory, OptionFactory
 
@@ -11,9 +12,22 @@ def media_storage(settings, tmpdir):
     settings.MEDIA_ROOT = tmpdir.strpath
 
 
+# MODELS ##########################
+
+
 @pytest.fixture
-def survey() -> Survey:
-    return SurveyFactory()
+def department() -> Department:
+    return DepartmentFactory()
+
+
+@pytest.fixture
+def option() -> Option:
+    return OptionFactory()
+
+
+@pytest.fixture
+def hospital() -> Hospital:
+    return HospitalFactory()
 
 
 @pytest.fixture
@@ -22,8 +36,14 @@ def question() -> Question:
 
 
 @pytest.fixture
-def option() -> Option:
-    return OptionFactory()
+def survey() -> Survey:
+    return SurveyFactory()
+
+
+# FORMS #########################
+
+
+# MISC #########################
 
 
 @pytest.fixture

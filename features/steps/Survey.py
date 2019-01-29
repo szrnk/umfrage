@@ -278,14 +278,25 @@ def step_impl(context, surveyname):
                 assert option_text == option.text
 
 
-# @step('The final question of "{surveyname}" is multichoice')
-# def step_impl(context, surveyname):
-#     """
-#     :type context: behave.runner.Context
-#     """
-#     br = context.browser
-#     survey = Survey.objects.filter(name=surveyname).first()
-#     section = survey.sections()[-1]
-#     question = section.questions()[-1]
-#     br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+@step('The final question of "{surveyname}" is multichoice')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    survey = Survey.objects.filter(name=surveyname).first()
+    section = survey.section_set.last()
+
+    question = section.question_set.first()
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 4
+
+    question = section.question_set.last()
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 4
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 0
+
 

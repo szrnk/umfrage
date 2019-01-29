@@ -1,4 +1,4 @@
-from factory import DjangoModelFactory, Sequence
+from factory import DjangoModelFactory, Sequence, SubFactory
 
 from ..models import Hospital, Department
 
@@ -12,7 +12,7 @@ class HospitalFactory(DjangoModelFactory):
 
 
 class DepartmentFactory(DjangoModelFactory):
-
+    hospital = SubFactory(HospitalFactory)
     name = Sequence(lambda n: "Department %03d" % n)
 
     class Meta:

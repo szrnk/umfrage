@@ -139,7 +139,7 @@ class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
             return self.form_invalid(form)
 
     def form_valid(self, form):
-        form.save(self.request)
+        form.save()
         return HttpResponseRedirect(self.get_success_url())
 
     # def form_invalid(self, form):
