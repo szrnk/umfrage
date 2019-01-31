@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load survey_extras %}
+{% load crispy_forms_tags %}
+
 {% block content %}
   {% if not survey %}
 
@@ -28,8 +30,9 @@
                 <div id="question_{{ question.id }}">
                   <form action="" method="post">
                     {% csrf_token %}
-                    {% get_survey_question_form survey department question %}
-                    <input type="submit" value="Submit">
+                    {% get_survey_question_form survey department question as the_form %}
+                    {{ the_form|crispy }}
+                    <input class="btn btn-primary btn-sm" type="submit" value="Submit">
                   </form>
                 </div>
               {% endfor %}
