@@ -5,7 +5,9 @@ from django.db.models.signals import post_migrate
 def migrated__add_admins_callback(sender, **kwargs):
 
     def create_or_skip(username, email, password):
-        from core.users.models import User
+
+        # must import this here -- late import, else system not setup, yet.
+        from .models import User  # noqa F401
         try:
             User.objects.get(username=username)
             return
@@ -23,7 +25,9 @@ class UsersAppConfig(AppConfig):
 
     def ready(self):
         try:
-            import users.signals  # noqa F401
+
+            # must import this here -- late import, else system not setup, yet.
+            from . import signals  # noqa F401
         except ImportError:
             pass
 
