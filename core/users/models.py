@@ -3,8 +3,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from .signals import capture_survey_and_department
-
 
 class User(AbstractUser):
 
@@ -12,8 +10,6 @@ class User(AbstractUser):
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
     department = models.ForeignKey("correspondents.Department", on_delete=models.CASCADE, null=True)
-    # TODO tidy
-    #surveys = models.ManyToManyField("surveys.Survey")
     invitations = models.ManyToManyField("surveys.Invitation")
 
     def get_absolute_url(self):

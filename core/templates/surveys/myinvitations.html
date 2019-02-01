@@ -8,6 +8,11 @@
       Responding on behalf of {{ invitation.department.name }} of {{ invitation.department.hospital.name }}
       <br><a href="{{ invitation.get_url }}">Answer the survey now</a>
     </li>
+  {% empty %}
+    <p>Normally you will have received an invitation by email. If so, go back to your email and click on
+    the invitation link, or paste it in your browser. <br>
+
+      Otherwise contact the organiser, as described on the other pages.</p>
   {% endfor %}
   </ul>
 {% endblock content %}
