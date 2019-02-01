@@ -53,9 +53,6 @@
         </li>
         {% if request.user.is_authenticated %}
           <li class="nav-item">
-            <a id="surveys-link" class="nav-link" href="{% url 'surveys:index' %}">{% trans "Surveys" %}</a>
-          </li>
-          <li class="nav-item">
             <a id="survey-link" class="nav-link" href="{% url 'surveys:current' %}">{% trans "Current Survey" %}</a>
           </li>
           <li class="nav-item">
@@ -63,6 +60,9 @@
             <a class="nav-link" href="{% url 'users:detail' request.user.username %}">{% trans "My Profile" %}</a>
           </li>
           {% if request.user.is_superuser %}
+{#            <li class="nav-item">#}
+{#              <a id="surveys-link" class="nav-link" href="{% url 'surveys:index' %}">{% trans "Surveys" %}</a>#}
+{#            </li>#}
             <li class="nav-item">
               <a id="survey-link" class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin" %}</a>
             </li>

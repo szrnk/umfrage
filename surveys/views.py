@@ -42,10 +42,8 @@ class InvitationView(generic.RedirectView):
         request.session["invitation_token"] = token
         if request.user.is_authenticated:
             user = request.user
-            user.surveys.add(invitation.survey)
+            # user.surveys.add(invitation.survey)
             user.invitations.add(invitation)
-            # TODO consider dropping from user
-            user.department_id = invitation.department.id
             user.save()
 
             messages.add_message(
@@ -81,9 +79,9 @@ class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
         survey_id = self.request.session.get("survey_id")
         survey = Survey.objects.filter(pk=survey_id).first()
         self.survey = survey
-        if survey is not None:
-            # This has the side effect of ensuring session tracking for question and section
-            self.progress = Progress(self.request, survey)
+        # if survey is not None:
+        #     # This has the side effect of ensuring session tracking for question and section
+        #     self.progress = Progress(self.request, survey)
         return survey
 
     def get_context_data(self, **kwargs):
@@ -104,7 +102,7 @@ class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
         kwargs = {}
         request = self.request
         survey_id = request.session.get("survey_id")
-        progress = request.session.get("progress")
+        #progress = request.session.get("progress")
         survey = get_object_or_404(Survey, pk=survey_id)
         department_id = request.session["department_id"]
         department = Department.objects.filter(id=department_id).first()
@@ -152,4 +150,4 @@ class MyInvitationsView(generic.ListView):
     template_name = "surveys/myinvitations.html"
 
     def get_queryset(self):
-        return self.request.user.department.invitation_set.all()
+        return self.request.user.invitations.all()
