@@ -48,7 +48,8 @@ TYPE_CHOICES = (("SINGLE", "Radio"), ("MULTI", "Checkboxes"))
 class Question(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     code = models.CharField(max_length=40)
-    text = models.TextField()
+    text = models.TextField(blank=True)
+    help_text = models.TextField(blank=True)
     qtype = models.CharField(max_length=9, choices=TYPE_CHOICES, default="SINGLE")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 

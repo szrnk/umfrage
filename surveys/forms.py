@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 from django.forms import ChoiceField, MultipleChoiceField
 
 from surveys.models import Option, Answer, Question
-from surveys.progress import Progress
 
 
 class FlexiForm(forms.Form):
@@ -19,6 +18,7 @@ class FlexiForm(forms.Form):
         options = [(o.id, o.text) for o in self.question.options()]
         self.field_name = f"option"
         if self.question.qtype == "MULTI":
+            self.single = False
             self.fields[self.field_name] = MultipleChoiceField(
                 label=self.question.text,
                 choices=options,
@@ -26,6 +26,7 @@ class FlexiForm(forms.Form):
                 required=False,
             )
         else:
+            self.single = True
             self.fields[self.field_name] = ChoiceField(
                 label=self.question.text,
                 choices=options,
@@ -35,6 +36,7 @@ class FlexiForm(forms.Form):
         self.fields["qid"] = forms.CharField(
             label="qid", max_length=10, widget=forms.HiddenInput()
         )
+        self.fields[self.field_name].help_text = self.question.help_text
 
     def get_initial_for_field(self, field, field_name):
         if field_name == "qid":
@@ -43,8 +45,13 @@ class FlexiForm(forms.Form):
             question_id=self.question.pk, department_id=self.department.pk
         ).first()
         if answer is not None:
-            return [str(o.id) for o in answer.options.all()]
-        return []
+            values = [str(o.id) for o in answer.options.all()]
+            if self.single:
+                if values:
+                    return values[0]
+                return ''
+            return values
+        return ''
 
     def clean(self):
         if not self.cleaned_data[self.field_name]:

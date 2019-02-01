@@ -83,7 +83,7 @@ class QuestionAdmin(EditLinkToParentSection, admin.ModelAdmin):
     list_display = ("code", "truncated_text")
     # exclude = ('order', )
     readonly_fields = ("section", "section_edit_link")
-    fieldsets = ((None, {"fields": ("section", "section_edit_link", "code", "text")}),)
+    fieldsets = ((None, {"fields": ("section", "section_edit_link", "code", "text", "help_text", "qtype")}),)
     extra = 0
 
 
