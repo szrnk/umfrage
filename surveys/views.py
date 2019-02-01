@@ -46,6 +46,7 @@ class InvitationView(generic.RedirectView):
             user.invitations.add(invitation)
             # TODO consider dropping from user
             user.department_id = invitation.department.id
+            user.save()
 
             messages.add_message(
                 request,
