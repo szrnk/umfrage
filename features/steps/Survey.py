@@ -6,7 +6,7 @@ from core.users.tests.factories import AdminFactory
 from correspondents.models import Hospital, Department
 from correspondents.tests.factories import basic_hospital_structure
 from surveys.models import Survey, Invitation
-from surveys.tests.factories import basic_survey_structure
+from surveys.tests.factories import tight_survey_structure
 
 use_step_matcher("parse")
 
@@ -112,14 +112,14 @@ def step_impl(context, title):
     assert title_saved.text == title
 
 
-@given('there is a basic_survey called "{surveyname}"')
+@given('there is a tight_survey called "{surveyname}"')
 def step_impl(context, surveyname):
     """
     :type context: behave.runner.Context
     """
     ss = Survey.objects.filter(name=surveyname)
     if not ss:
-        basic_survey_structure(surveyname=surveyname)
+        tight_survey_structure(surveyname=surveyname)
     ss = Survey.objects.filter(name=surveyname)
     assert ss
 
@@ -274,30 +274,105 @@ def step_impl(context, surveyname):
             labels = ss.parent.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//label")
             question_text = labels[0].text
             assert question_text == question.text
-            for oidx, option in enumerate(question.options()):
-                option_text = labels[oidx+1].text
-                assert option_text == option.text
+            # for oidx, option in enumerate(question.options()):
+            #     option_text = labels[oidx+1].text
+            #     assert option_text == option.text
 
 
-@step('The final question of "{surveyname}" is multichoice')
+@step('The second question of "{surveyname}" is multichoice')
 def step_impl(context, surveyname):
     """
     :type context: behave.runner.Context
     """
     br = context.browser
     survey = Survey.objects.filter(name=surveyname).first()
-    section = survey.section_set.last()
+    section = survey.section_set.first()
 
-    question = section.question_set.first()
+    question = section.question_set.order_by('order').all()[0]
     els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
     assert len(els) == 0
     els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
     assert len(els) == 4
 
-    question = section.question_set.last()
+    question = section.question_set.all()[1]
     els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
     assert len(els) == 4
     els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
     assert len(els) == 0
+
+
+@step('The third question of "{surveyname}" is select')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    survey = Survey.objects.filter(name=surveyname).first()
+    section = survey.section_set.first()
+
+    question = section.question_set.order_by('order').all()[0]
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 4
+
+    question = section.question_set.all()[2]
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath("//div[@id='question_3']//form//option")
+    assert len(els) == 4
+    assert all([el.text.startswith('text') for el in els])
+
+
+@step('The fourth question of "{surveyname}" is text')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    survey = Survey.objects.filter(name=surveyname).first()
+    section = survey.section_set.first()
+
+    question = section.question_set.order_by('order').all()[0]
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 4
+
+    question = section.question_set.all()[3]
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//option")
+    assert len(els) == 0
+    """
+  <div id="question_4">
+    <form action="" method="post">
+      <input type="hidden" name="csrfmiddlewaretoken" value="EBm9Qe8RMjLfkm67abt47YtKlvg3XqWnYGUoZB8daZ2sfOkgxA5t8rkrqiAKJquQ"/>
+
+
+      <div id="div_id_option" class="form-group">
+      
+          <label for="id_option" class="col-form-label ">
+            text for question 3, with original order 3
+          </label>
+          
+        <div class="">
+            <input type="text" name="option" class="textinput textInput form-control" id="id_option"/>
+        </div>
+        
+      </div>
+        
+      <input type="hidden" name="qid" value="4" id="id_qid"/>
+
+      <input class="btn btn-primary btn-sm" type="submit" value="Submit"/>
+    </form>
+  </div>
+    """
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//*[@type='text']")
+    assert len(els) == 1
 
 

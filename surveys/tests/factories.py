@@ -35,7 +35,7 @@ class QuestionFactory(DjangoModelFactory):
 class OptionFactory(DjangoModelFactory):
     question = SubFactory(QuestionFactory)
     code = Sequence(lambda n: "OCode%03d" % n)
-    text = Faker("sentence", nb_words=30)
+    text = Faker("sentence", nb_words=10)
     order = Sequence(lambda n: n)
 
     class Meta:
@@ -65,11 +65,42 @@ def basic_survey_structure(surveyname=None):
             for question in section.questions():
                 pass
         lastq = question
-        lastq.qtype = 'MULTI'
+        lastq.qtype = 'MULTICHOICE'
         lastq.save()
 
         surveys.append(su)
     return surveys
+
+
+# def tight_survey_structure(surveyname=None):
+#     # allow a one-shot survey name
+#     if surveyname is not None:
+#         survey_kwargs = dict(name=surveyname)
+#     else:
+#         survey_kwargs = dict()
+#
+#     surveys = []
+#     for sui in range(2):
+#         su = SurveyFactory(**survey_kwargs)
+#         survey_kwargs = dict()
+#         for sei in range(4):
+#             se = SectionFactory(survey=su, title=f"this is section {sei}")
+#             for qui in range(4):
+#                 qu = QuestionFactory(
+#                     section=se,
+#                     text=f"text for question {qui}, with original order {qui}",
+#                 )
+#                 for opi in range(4):
+#                     _ = OptionFactory(question=qu, text=f"text for option {opi}")
+#
+#         # Make the second question in the first section a multi, for later tests
+#         section = su.section_set.first()
+#         second = section.question_set.all()[1]
+#         second.qtype = 'MULTICHOICE'
+#         second.save()
+#
+#         surveys.append(su)
+#     return surveys
 
 
 def tight_survey_structure(surveyname=None):
@@ -85,21 +116,43 @@ def tight_survey_structure(surveyname=None):
         survey_kwargs = dict()
         for sei in range(4):
             se = SectionFactory(survey=su, title=f"this is section {sei}")
-            for qui in range(4):
-                qu = QuestionFactory(
-                    section=se,
-                    text=f"text for question {qui}, with original order {qui}",
-                )
-                for opi in range(4):
-                    _ = OptionFactory(question=qu, text=f"text for option {opi}")
 
-        # Make the last question in the last section a multi, for later tests
-        for section in su.sections():
-            for question in section.questions():
-                pass
-        lastq = question
-        lastq.qtype = 'MULTI'
-        lastq.save()
+            # first question
+            qui = 0
+            qu = QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui}",
+            )
+            for opi in range(4):
+                _ = OptionFactory(question=qu, text=f"text for option {opi}")
+
+            # second question
+            qui = 1
+            qu = QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui}",
+                qtype='MULTICHOICE'
+            )
+            for opi in range(4):
+                _ = OptionFactory(question=qu, text=f"text for option {opi}")
+
+            # third question
+            qui = 2
+            qu = QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui}",
+                qtype='SELECT'
+            )
+            for opi in range(4):
+                _ = OptionFactory(question=qu, text=f"text for option {opi}")
+
+            # fourth question
+            qui = 3
+            QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui}",
+                qtype='TEXT'
+            )
 
         surveys.append(su)
     return surveys

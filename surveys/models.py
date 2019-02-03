@@ -42,7 +42,7 @@ class Section(models.Model):
         return len(self.questions())
 
 
-TYPE_CHOICES = (("SINGLE", "Radio"), ("MULTI", "Checkboxes"))
+TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELECT", "Dropdown"), ("TEXT", "Text"))
 
 
 class Question(models.Model):
@@ -50,7 +50,7 @@ class Question(models.Model):
     code = models.CharField(max_length=40)
     text = models.TextField(blank=True)
     help_text = models.TextField(blank=True)
-    qtype = models.CharField(max_length=9, choices=TYPE_CHOICES, default="SINGLE")
+    qtype = models.CharField(max_length=20, choices=TYPE_CHOICES, default="SINGLECHOICE")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
 
     objects = QuestionQuerySet.as_manager()
@@ -86,9 +86,17 @@ class Option(models.Model):
         return Truncator(self.text).chars(20)
 
 
+class Value(models.Model):
+    text = models.TextField()
+
+    def __str__(self):
+        return self.text
+
+
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     options = models.ManyToManyField(Option)
+    value = models.OneToOneField(Value, on_delete=models.CASCADE, null=True)
     department = models.ForeignKey(
         "correspondents.Department", on_delete=models.CASCADE
     )

@@ -1,8 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import ChoiceField, MultipleChoiceField
+from django.forms import ChoiceField, MultipleChoiceField, CharField, IntegerField
 
-from surveys.models import Option, Answer, Question
+from surveys.models import Option, Answer, Question, Value
 
 
 class FlexiForm(forms.Form):
@@ -17,22 +17,61 @@ class FlexiForm(forms.Form):
         super().__init__(*args, **kwargs)
         options = [(o.id, o.text) for o in self.question.options()]
         self.field_name = f"option"
-        if self.question.qtype == "MULTI":
+        self.option_field = False
+        if self.question.qtype == "MULTICHOICE":
             self.single = False
+            self.option_field = True
             self.fields[self.field_name] = MultipleChoiceField(
                 label=self.question.text,
                 choices=options,
                 widget=forms.CheckboxSelectMultiple(),
                 required=False,
             )
-        else:
+        elif self.question.qtype == "SINGLECHOICE":
             self.single = True
+            self.option_field = True
             self.fields[self.field_name] = ChoiceField(
                 label=self.question.text,
                 choices=options,
                 widget=forms.RadioSelect(),
                 required=False,
             )
+        elif self.question.qtype == "SELECT":
+            self.single = True
+            self.option_field = True
+            self.fields[self.field_name] = ChoiceField(
+                label=self.question.text,
+                choices=options,
+                required=False,
+            )
+        elif self.question.qtype == "TEXT":
+            self.single = True
+            self.fields[self.field_name] = CharField(
+                label=self.question.text,
+                required=False,
+            )
+        elif self.question.qtype == "ESSAY":  # similar to text but box is bigger
+            self.single = True
+            self.fields[self.field_name] = CharField(
+                label=self.question.text,
+                required=False,
+            )
+        elif self.question.qtype == "INTEGER":
+            self.single = True
+            self.fields[self.field_name] = IntegerField(
+                label=self.question.text,
+                choices=options,
+                required=False,
+            )
+        elif self.question.qtype == "EMAIL":
+            self.single = True
+            self.fields[self.field_name] = IntegerField(
+                label=self.question.text,
+                choices=options,
+                required=False,
+            )
+        else:
+            raise AttributeError("Bad field type")
         self.fields["qid"] = forms.CharField(
             label="qid", max_length=10, widget=forms.HiddenInput()
         )
@@ -45,12 +84,15 @@ class FlexiForm(forms.Form):
             question_id=self.question.pk, department_id=self.department.pk
         ).first()
         if answer is not None:
-            values = [str(o.id) for o in answer.options.all()]
-            if self.single:
-                if values:
-                    return values[0]
-                return ''
-            return values
+            if self.option_field:
+                values = [str(o.id) for o in answer.options.all()]
+                if self.single:
+                    if values:
+                        return values[0]
+                    return ''
+                return values
+            else:
+                return answer.value.text
         return ''
 
     def clean(self):
@@ -60,16 +102,27 @@ class FlexiForm(forms.Form):
     def save(self):
         qid = int(self.cleaned_data["qid"])
         question = Question.objects.filter(pk=qid).first()
-        option_ids = self.cleaned_data[self.field_name]
-        if type(option_ids) == str:
-            option_ids = [option_ids]
-        option_ids = [int(oid) for oid in option_ids]
-        options = Option.objects.filter(id__in=option_ids)
+
+        if self.option_field:
+            option_ids = self.cleaned_data[self.field_name]
+            if type(option_ids) == str:
+                option_ids = [option_ids]
+            option_ids = [int(oid) for oid in option_ids]
+            options = Option.objects.filter(id__in=option_ids)
+        else:
+            val = self.cleaned_data[self.field_name]
+            val = Value.objects.create(text=val)
+
         earlier = Answer.objects.filter(
             question_id=qid, department_id=self.department.pk
         ).first()
         if earlier:
             earlier.delete()
+
         answer = Answer.objects.create(question=question, department=self.department)
-        for option in options:
-            answer.options.add(option)
+        if self.option_field:
+            for option in options:
+                answer.options.add(option)
+        else:
+            answer.value = val
+            answer.save()
