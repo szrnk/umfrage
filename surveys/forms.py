@@ -50,20 +50,21 @@ class FlexiForm(forms.Form):
                 label=self.question.text,
                 required=False,
             )
-        elif self.question.qtype == "ESSAY":  # similar to text but box is bigger
+        elif self.question.qtype == "ESSAY":
             self.single = True
             self.fields[self.field_name] = CharField(
                 label=self.question.text,
+                widget=forms.Textarea,
                 required=False,
             )
-        elif self.question.qtype == "INTEGER":
+        elif self.question.qtype == "INTEGER":  # Untested
             self.single = True
             self.fields[self.field_name] = IntegerField(
                 label=self.question.text,
                 choices=options,
                 required=False,
             )
-        elif self.question.qtype == "EMAIL":
+        elif self.question.qtype == "EMAIL":  # Untested
             self.single = True
             self.fields[self.field_name] = IntegerField(
                 label=self.question.text,

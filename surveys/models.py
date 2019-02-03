@@ -42,7 +42,8 @@ class Section(models.Model):
         return len(self.questions())
 
 
-TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELECT", "Dropdown"), ("TEXT", "Text"))
+TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELECT", "Select (Dropdown)"), ("TEXT", "Text"),
+                ("ESSAY", "Essay"))
 
 
 class Question(models.Model):

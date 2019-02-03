@@ -125,6 +125,33 @@ class TestFlexiForm:
         assert len(opts) == 0
         assert ans.value.text == TEST_TEXT
 
+    def test_essay(
+        self,
+        user: settings.AUTH_USER_MODEL,
+        survey: Survey,
+        department: Department,
+        question: Question,
+    ):
+        department.user_set.add(user)
+        question.qtype = "ESSAY"
+        TEST_TEXT = """something here
+        and there"""
+        form = FlexiForm(
+            data={
+                "option": TEST_TEXT,
+                "qid": str(question.id),
+            },
+            survey=survey,
+            department=department,
+            question=question,
+        )
+        assert form.is_valid()
+        form.save()
+        ans = Answer.objects.filter(department__pk=department.pk).first()
+        opts = ans.options.all()
+        assert len(opts) == 0
+        assert ans.value.text == TEST_TEXT
+
 
 def test_explore_question_form(
     user: settings.AUTH_USER_MODEL,

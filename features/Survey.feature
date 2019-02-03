@@ -26,3 +26,4 @@ Feature: Surveys
     And The second question of "My Basic Survey" is multichoice
     And The third question of "My Basic Survey" is select
     And The fourth question of "My Basic Survey" is text
+    And The fifth question of "My Basic Survey" is essay

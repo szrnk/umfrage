@@ -121,7 +121,9 @@ def tight_survey_structure(surveyname=None):
             qui = 0
             qu = QuestionFactory(
                 section=se,
-                text=f"text for question {qui}, with original order {qui}",
+                text=f"text for question {qui}, with original order {qui} - Single Choice",
+                qtype='SINGLECHOICE'
+
             )
             for opi in range(4):
                 _ = OptionFactory(question=qu, text=f"text for option {opi}")
@@ -130,7 +132,7 @@ def tight_survey_structure(surveyname=None):
             qui = 1
             qu = QuestionFactory(
                 section=se,
-                text=f"text for question {qui}, with original order {qui}",
+                text=f"text for question {qui}, with original order {qui} - Multiple Choice",
                 qtype='MULTICHOICE'
             )
             for opi in range(4):
@@ -140,7 +142,7 @@ def tight_survey_structure(surveyname=None):
             qui = 2
             qu = QuestionFactory(
                 section=se,
-                text=f"text for question {qui}, with original order {qui}",
+                text=f"text for question {qui}, with original order {qui} - Select (Dropdown)",
                 qtype='SELECT'
             )
             for opi in range(4):
@@ -150,8 +152,16 @@ def tight_survey_structure(surveyname=None):
             qui = 3
             QuestionFactory(
                 section=se,
-                text=f"text for question {qui}, with original order {qui}",
+                text=f"text for question {qui}, with original order {qui} - Text input",
                 qtype='TEXT'
+            )
+
+            # fifth question
+            qui = 4
+            QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui} - Essay input",
+                qtype='ESSAY'
             )
 
         surveys.append(su)
