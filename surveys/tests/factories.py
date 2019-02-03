@@ -164,5 +164,21 @@ def tight_survey_structure(surveyname=None):
                 qtype='ESSAY'
             )
 
+            # sixth question
+            qui = 5
+            QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui} - Integer input",
+                qtype='INTEGER'
+            )
+
+            # seventh question
+            qui = 6
+            QuestionFactory(
+                section=se,
+                text=f"text for question {qui}, with original order {qui} - Email input",
+                qtype='EMAIL'
+            )
+
         surveys.append(su)
     return surveys

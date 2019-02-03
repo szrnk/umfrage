@@ -27,3 +27,5 @@ Feature: Surveys
     And The third question of "My Basic Survey" is select
     And The fourth question of "My Basic Survey" is text
     And The fifth question of "My Basic Survey" is essay
+    And The sixth question of "My Basic Survey" is integer
+    And The seventh question of "My Basic Survey" is email

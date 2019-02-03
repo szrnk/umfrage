@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import ChoiceField, MultipleChoiceField, CharField, IntegerField
+from django.forms import ChoiceField, MultipleChoiceField, CharField, IntegerField, EmailField
 
 from surveys.models import Option, Answer, Question, Value
 
@@ -57,18 +57,16 @@ class FlexiForm(forms.Form):
                 widget=forms.Textarea,
                 required=False,
             )
-        elif self.question.qtype == "INTEGER":  # Untested
+        elif self.question.qtype == "INTEGER":
             self.single = True
             self.fields[self.field_name] = IntegerField(
                 label=self.question.text,
-                choices=options,
                 required=False,
             )
-        elif self.question.qtype == "EMAIL":  # Untested
+        elif self.question.qtype == "EMAIL":
             self.single = True
-            self.fields[self.field_name] = IntegerField(
+            self.fields[self.field_name] = EmailField(
                 label=self.question.text,
-                choices=options,
                 required=False,
             )
         else:
@@ -95,10 +93,6 @@ class FlexiForm(forms.Form):
             else:
                 return answer.value.text
         return ''
-
-    def clean(self):
-        if not self.cleaned_data[self.field_name]:
-            raise ValidationError("Missing option")
 
     def save(self):
         qid = int(self.cleaned_data["qid"])

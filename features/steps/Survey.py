@@ -374,3 +374,51 @@ def step_impl(context, surveyname):
     assert len(els) == 1
 
 
+@step('The sixth question of "{surveyname}" is integer')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    survey = Survey.objects.filter(name=surveyname).first()
+    section = survey.section_set.first()
+
+    question = section.question_set.all()[5]
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//option")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//*[@type='text']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//textarea")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//*[@type='number']")
+    assert len(els) == 1
+
+
+@step('The seventh question of "{surveyname}" is email')
+def step_impl(context, surveyname):
+    """
+    :type context: behave.runner.Context
+    """
+    br = context.browser
+    survey = Survey.objects.filter(name=surveyname).first()
+    section = survey.section_set.first()
+
+    question = section.question_set.all()[6]
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='checkbox']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//option")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//*[@type='text']")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//textarea")
+    assert len(els) == 0
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//*[@type='email']")
+    assert len(els) == 1
+
+
