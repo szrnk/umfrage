@@ -43,10 +43,7 @@ class Section(models.Model):
 
 
 TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELECT", "Select (Dropdown)"), ("TEXT", "Text"),
-                ("ESSAY", "Essay"),
-                ("INTEGER", "Integer"),
-                ("EMAIL", "Email"),
-                )
+                ("ESSAY", "Essay"), ("INTEGER", "Integer"), ("EMAIL", "Email"),)
 
 
 class Question(models.Model):
