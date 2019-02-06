@@ -66,6 +66,10 @@ class Question(models.Model):
         return Truncator(self.text).chars(30)
 
     def triggered(self):
+        # There are no dependencies, so trigger
+        if not self.trigger_questions.all().count():
+            return True
+        # Trigger if there are any dependencies that match
         return any(q.show() for q in self.trigger_questions.all())
 
     class Meta:
@@ -131,9 +135,6 @@ class Invitation(models.Model):
 class DisplayLogic(PolymorphicModel):
     shown_question = models.ForeignKey('Question', related_name='trigger_questions', null=True, on_delete=models.CASCADE)
     trigger_question = models.ForeignKey('Question',  related_name='shown_question', null=True, on_delete=models.CASCADE)
-
-    def show(self):
-        return True
 
     def __str__(self):
         return f"DiLog {self.trigger_question.id} triggers {self.shown_question.id}"
