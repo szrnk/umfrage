@@ -79,6 +79,15 @@ INSTALLED_APPS += ['behave_django']  # noqa F405
 # ------------------------------------------------------------------------------
 INSTALLED_APPS += ['zappa_django_utils']
 
+# ADMIN
+# ------------------------------------------------------------------------------
+# Django Admin URL regex.
+ADMIN_URL = env('DJANGO_ADMIN_URL', default='admin/')
+print('#'*60)
+print(f'ADMIN_URL: {ADMIN_URL}')
+print(f'DJANGO_ADMIN_URL: {env("DJANGO_ADMIN_URL")}')
+print('#'*60)
+
 
 # zappa specific
 # ==============
