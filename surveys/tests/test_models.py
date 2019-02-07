@@ -31,7 +31,7 @@ class TestDisplayLogic:
         dl = DisplayByOptionsFactory(trigger_question=trigger_question, shown_question=shown_question)
         dl.options.add(last_option)
 
-        # not yet triggered - no answer
+        # not yet triggered - no answer has been provided
         assert(not shown_question.triggered())
 
         ans = Answer.objects.create(question=trigger_question, department=dep)
