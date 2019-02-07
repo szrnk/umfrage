@@ -189,7 +189,7 @@ admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
 # admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
 # admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
-# admin.site.register(DisplayByValue, DisplayByValueAdmin)
+admin.site.register(DisplayByValue, DisplayByValueAdmin)
 
 
 # TODO: We want a better place to put these unregisters...
