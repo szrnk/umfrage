@@ -187,8 +187,8 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
-# admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
-admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
+admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
+# admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
 # admin.site.register(DisplayByValue, DisplayByValueAdmin)
 
 
