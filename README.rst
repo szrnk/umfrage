@@ -99,5 +99,8 @@ gives
 " The current path, admin/asdfg, didn't match any of these. "
 whereas whe earlier failing pattern has a dev/ at the start of the error url.
 
+----
 
+This version breaks it, giving
+ "The current path, dev/admin/, didn't match any of these. "
 
