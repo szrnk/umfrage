@@ -6,6 +6,8 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.forms import Textarea
 from django.urls import reverse
+from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter, \
+    StackedPolymorphicInline, PolymorphicInlineSupportMixin
 
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
