@@ -86,3 +86,8 @@ References
 ^^^^^^^^^^
 
 https://simpleisbetterthancomplex.com/tutorial/2018/11/28/advanced-form-rendering-with-django-crispy-forms.html
+
+
+Notes
+^^^^^
+Deployed OK. Admin was functional. An invitation could be made and accepted. Values were stored.

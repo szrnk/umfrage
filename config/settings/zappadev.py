@@ -86,7 +86,7 @@ INSTALLED_APPS += ['zappa_django_utils']
 DATABASES = {
     'default': {
         'ENGINE': 'zappa_django_utils.db.backends.s3sqlite',
-        'NAME': 'sqlite.db',
+        'NAME': 'sqlite.started-2019-02-06.db',
         'BUCKET': ZAPPA_SQLITE_BUCKET
     }
 }
