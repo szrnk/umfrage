@@ -84,10 +84,20 @@ zappa manage dev create_basic_hospital_structure Alexandra-Klinic  Accident-Depa
 
 References
 ^^^^^^^^^^
-
+ls sq
 https://simpleisbetterthancomplex.com/tutorial/2018/11/28/advanced-form-rendering-with-django-crispy-forms.html
 
 
 Notes
 ^^^^^
 Deployed OK. Admin was functional. An invitation could be made and accepted. Values were stored.
+
+This version deploys. Admin reachable.
+Interesting that adding rubbish to break the url....
+/dev/admin/asdfg
+gives
+" The current path, admin/asdfg, didn't match any of these. "
+whereas whe earlier failing pattern has a dev/ at the start of the error url.
+
+
+
