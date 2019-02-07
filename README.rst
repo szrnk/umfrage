@@ -101,3 +101,5 @@ whereas whe earlier failing pattern has a dev/ at the start of the error url.
 
 
 
+Fails:
+ The current path, dev/admin/, didn't match any of these. 
