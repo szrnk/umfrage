@@ -127,7 +127,7 @@ class OptionInline(SortableInlineAdminMixin, admin.StackedInline):
 
 
 class QuestionAdmin(PolymorphicInlineSupportMixin, EditLinkToParentSection, admin.ModelAdmin):
-    inlines = [OptionInline, DisplayLogicInline]
+    inlines = [OptionInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("code", "truncated_text")
     # exclude = ('order', )
