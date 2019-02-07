@@ -34,6 +34,9 @@
                       {% get_survey_question_form survey department question as the_form %}
                       {{ the_form | crispy }}
                       <input class="btn btn-primary btn-sm" type="submit" value="Submit">
+                      {% if request.user.is_superuser %}
+                        <a href="{% url 'admin:surveys_question_change' question.id %}">Edit question</a>
+                      {% endif %}
                     </form>
                   </div>
                 {% endif %}
