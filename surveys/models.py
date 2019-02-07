@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
 from django.utils.text import Truncator
+from polymorphic.models import PolymorphicModel
 
 from correspondents.models import Department
 from .managers import QuestionQuerySet
@@ -53,7 +54,6 @@ class Question(models.Model):
     help_text = models.TextField(blank=True)
     qtype = models.CharField(max_length=20, choices=TYPE_CHOICES, default="SINGLECHOICE")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
-
     objects = QuestionQuerySet.as_manager()
 
     def options(self):
@@ -64,6 +64,9 @@ class Question(models.Model):
 
     def truncated_text(self):
         return Truncator(self.text).chars(30)
+
+    def triggered(self):
+        return any(q.show() for q in self.trigger_questions.all())
 
     class Meta:
         # order must be first
@@ -84,7 +87,7 @@ class Option(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return Truncator(self.text).chars(20)
+        return f'Su:{self.question.section.survey.id} Se: {self.question.section.id} Q:{self.question.id} O:{self.id} ' + Truncator(self.text).chars(20)
 
 
 class Value(models.Model):
@@ -123,3 +126,60 @@ class Invitation(models.Model):
 
     def get_url(self):
         return reverse("surveys:invite", kwargs={"token": self.token})
+
+
+class DisplayLogic(PolymorphicModel):
+    shown_question = models.ForeignKey('Question', related_name='trigger_questions', null=True, on_delete=models.CASCADE)
+    trigger_question = models.ForeignKey('Question',  related_name='shown_question', null=True, on_delete=models.CASCADE)
+
+    def show(self):
+        return True
+
+    def __str__(self):
+        return f"DiLog {self.trigger_question.id} triggers {self.shown_question.id}"
+
+
+class DisplayByOptions(DisplayLogic):
+
+    options = models.ManyToManyField(Option)
+
+    def show(self):
+        if self.trigger_question.answer_set.count() == 0:
+            return False
+        intersection = self.trigger_question.answer_set.first().options.all().intersection(self.options.all())
+        return intersection.count()
+
+
+SHOW_LOGIC_CHOICES = (("==", "=="), (">=", ">="), ("<=", "<="), ("contains", "contains"), ("containsNoCase", "containsNoCase"), )
+
+
+class DisplayByValue(DisplayLogic):
+    value = models.CharField(max_length=100)
+    condition = models.CharField(max_length=20, choices=SHOW_LOGIC_CHOICES, default="==")
+
+    def show(self):
+        if self.trigger_question.answer_set.count() == 0:
+            return False
+
+        avalue = self.trigger_question.answer_set.first().value.text
+
+        if self.condition == '==':
+            if avalue == self.value:
+                return True
+        elif self.condition == '>=':
+            if int(avalue) >= int(self.value):
+                return True
+        elif self.condition == '<=':
+            if int(avalue) <= int(self.value):
+                return True
+        elif self.condition == 'contains':
+            if self.value in avalue:
+                return True
+        elif self.condition == 'containsNoCase':
+            if self.value.lower() in avalue.lower():
+                return True
+        return False
+
+
+
+
