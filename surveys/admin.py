@@ -100,24 +100,24 @@ class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
     child_models = (DisplayByOptions, DisplayByValue, )
 
 
-class DisplayLogicInline(StackedPolymorphicInline):
-    """
-    An inline for a polymorphic model.
-    The actual form appearance of each row is determined by
-    the child inline that corresponds with the actual model type.
-    """
-    class DisplayByValueAdminInline(StackedPolymorphicInline.Child):
-        model = DisplayByValue
-
-    class DisplayByOptionAdminInline(StackedPolymorphicInline.Child):
-        model = DisplayByOptions
-
-    model = DisplayLogic
-    fk_name = 'shown_question'
-    child_inlines = (
-        DisplayByValueAdminInline,
-        DisplayByOptionAdminInline,
-    )
+# class DisplayLogicInline(StackedPolymorphicInline):
+#     """
+#     An inline for a polymorphic model.
+#     The actual form appearance of each row is determined by
+#     the child inline that corresponds with the actual model type.
+#     """
+#     class DisplayByValueAdminInline(StackedPolymorphicInline.Child):
+#         model = DisplayByValue
+#
+#     class DisplayByOptionAdminInline(StackedPolymorphicInline.Child):
+#         model = DisplayByOptions
+#
+#     model = DisplayLogic
+#     fk_name = 'shown_question'
+#     child_inlines = (
+#         DisplayByValueAdminInline,
+#         DisplayByOptionAdminInline,
+#     )
 
 
 class OptionInline(SortableInlineAdminMixin, admin.StackedInline):
@@ -187,9 +187,9 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
-admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
-admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
-admin.site.register(DisplayByValue, DisplayByValueAdmin)
+# admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
+# admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
+# admin.site.register(DisplayByValue, DisplayByValueAdmin)
 
 
 # TODO: We want a better place to put these unregisters...
