@@ -87,12 +87,12 @@ class DisplayLogicChildAdmin(PolymorphicChildModelAdmin):
 
 class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByOptions
-    show_in_index = True
+    #show_in_index = True
 
 
 class DisplayByValueAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByValue
-    show_in_index = True
+    #show_in_index = True
 
 
 class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
@@ -188,8 +188,8 @@ admin.site.register(Question, QuestionAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
 admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
-# admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
-# admin.site.register(DisplayByValue, DisplayByValueAdmin)
+admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
+admin.site.register(DisplayByValue, DisplayByValueAdmin)
 
 
 # TODO: We want a better place to put these unregisters...
