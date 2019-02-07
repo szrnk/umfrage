@@ -6,11 +6,13 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.forms import Textarea
 from django.urls import reverse
+from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter, \
+    StackedPolymorphicInline, PolymorphicInlineSupportMixin
 
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
 
-from .models import Survey, Section, Question, Option, Invitation, Answer
+from .models import Survey, Section, Question, Option, Invitation, Answer, DisplayLogic, DisplayByOptions, DisplayByValue
 
 FORMFIELD_OVERRIDES = {
     models.TextField: {
@@ -71,14 +73,61 @@ class OptionAdmin(admin.ModelAdmin):
     exclude = ("order", "question")
 
 
+class DisplayLogicChildAdmin(PolymorphicChildModelAdmin):
+    """ Base admin class for all child models """
+    base_model = DisplayLogic
+
+    # By using these `base_...` attributes instead of the regular ModelAdmin `form` and `fieldsets`,
+    # the additional fields of the child models are automatically added to the admin form.
+    # base_form = ...
+    # base_fieldsets = (
+    #     ...
+    # )
+
+
+class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
+    base_model = DisplayByOptions
+    show_in_index = True
+
+
+class DisplayByValueAdmin(DisplayLogicChildAdmin):
+    base_model = DisplayByValue
+    show_in_index = True
+
+
+class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
+    base_model = DisplayLogic  # Optional, explicitly set here.
+    child_models = (DisplayByOptions, DisplayByValue, )
+
+
+class DisplayLogicInline(StackedPolymorphicInline):
+    """
+    An inline for a polymorphic model.
+    The actual form appearance of each row is determined by
+    the child inline that corresponds with the actual model type.
+    """
+    class DisplayByValueAdminInline(StackedPolymorphicInline.Child):
+        model = DisplayByValue
+
+    class DisplayByOptionAdminInline(StackedPolymorphicInline.Child):
+        model = DisplayByOptions
+
+    model = DisplayLogic
+    fk_name = 'shown_question'
+    child_inlines = (
+        DisplayByValueAdminInline,
+        DisplayByOptionAdminInline,
+    )
+
+
 class OptionInline(SortableInlineAdminMixin, admin.StackedInline):
     model = Option
     formfield_overrides = FORMFIELD_OVERRIDES
     extra = 0
 
 
-class QuestionAdmin(EditLinkToParentSection, admin.ModelAdmin):
-    inlines = [OptionInline]
+class QuestionAdmin(EditLinkToParentSection, PolymorphicInlineSupportMixin, admin.ModelAdmin):
+    inlines = [OptionInline, DisplayLogicInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("code", "truncated_text")
     # exclude = ('order', )
@@ -138,6 +187,10 @@ admin.site.register(Option, OptionAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Survey, SurveyAdmin)
+admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
+admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
+admin.site.register(DisplayByValue, DisplayByValueAdmin)
+
 
 # TODO: We want a better place to put these unregisters...
 admin.site.unregister(Group)

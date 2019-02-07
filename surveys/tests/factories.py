@@ -1,6 +1,6 @@
 from factory import DjangoModelFactory, Faker, Sequence, SubFactory
 
-from ..models import Survey, Section, Question, Option
+from ..models import Survey, Section, Question, Option, DisplayByOptions, DisplayByValue
 
 
 class SurveyFactory(DjangoModelFactory):
@@ -40,6 +40,24 @@ class OptionFactory(DjangoModelFactory):
 
     class Meta:
         model = Option
+
+
+class DisplayByOptionsFactory(DjangoModelFactory):
+    trigger_question = SubFactory(QuestionFactory)
+    shown_question = SubFactory(QuestionFactory)
+
+    class Meta:
+        model = DisplayByOptions
+
+
+class DisplayByValueFactory(DjangoModelFactory):
+    trigger_question = SubFactory(QuestionFactory)
+    shown_question = SubFactory(QuestionFactory)
+    value = 0
+    condition = '=='
+
+    class Meta:
+        model = DisplayByValue
 
 
 def basic_survey_structure(surveyname=None):

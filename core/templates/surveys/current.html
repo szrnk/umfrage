@@ -12,7 +12,7 @@
 
     <h2>Survey: {{ survey.name }}</h2>
     <h3>Department: {{ department.name }} of Hospital: {{ department.hospital }}</h3>
-    <h6 style="color:lightgray">section:{{ progress.section_index }}/question:{{ progress.question_index }}</h6>
+
     <div id="accordion">
       {% for section in survey.sections %}
         <div class="card">
@@ -27,14 +27,16 @@
           <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}" data-parent="#accordion">
             <div class="card-body">
               {% for question in section.questions %}
-                <div id="question_{{ question.id }}">
-                  <form action="" method="post">
-                    {% csrf_token %}
-                    {% get_survey_question_form survey department question as the_form %}
-                    {{ the_form | crispy }}
-                    <input class="btn btn-primary btn-sm" type="submit" value="Submit">
-                  </form>
-                </div>
+                {% if question.triggered %}
+                  <div id="question_{{ question.id }}">
+                    <form action="" method="post">
+                      {% csrf_token %}
+                      {% get_survey_question_form survey department question as the_form %}
+                      {{ the_form | crispy }}
+                      <input class="btn btn-primary btn-sm" type="submit" value="Submit">
+                    </form>
+                  </div>
+                {% endif %}
               {% endfor %}
             </div>
           </div>
