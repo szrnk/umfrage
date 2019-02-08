@@ -87,12 +87,10 @@ class DisplayLogicChildAdmin(PolymorphicChildModelAdmin):
 
 class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByOptions
-    show_in_index = True
 
 
 class DisplayByValueAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByValue
-    show_in_index = True
 
 
 class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
