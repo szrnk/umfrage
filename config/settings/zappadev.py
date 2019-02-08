@@ -2,14 +2,17 @@ import os
 from .base import *  # noqa
 from .base import env
 
+print('#'*60)
+print('ZAPPADEV config')
+print('#'*60)
+
 # zappa specific
 # ==============
 
 # prefetch the environment variables - must be defined in lambda console
-ZAPPA_DEBUG = os.environ['ZAPPA_DEBUG']
-ZAPPA_GATEWAY_HOST = os.environ['ZAPPA_GATEWAY_HOST']
-ZAPPA_SQLITE_BUCKET = os.environ['ZAPPA_SQLITE_BUCKET']
-ZAPPA_SECRET_KEY = os.environ['ZAPPA_SECRET_KEY']
+ZAPPA_DEBUG = env('ZAPPA_DEBUG', default=False)
+ZAPPA_GATEWAY_HOST = env('ZAPPA_GATEWAY_HOST', default='unspecified')
+ZAPPA_SECRET_KEY = env('ZAPPA_SECRET_KEY', default='missing - temp key.. as;dky6yasdkjfytsyAY!Ekhodfkjbasdjfypj12368u$%@(#$^naddflkjh')
 
 
 # GENERAL
@@ -85,7 +88,6 @@ INSTALLED_APPS += ['zappa_django_utils']
 ADMIN_URL = env('DJANGO_ADMIN_URL', default='admin/')
 print('#'*60)
 print(f'ADMIN_URL: {ADMIN_URL}')
-print(f'DJANGO_ADMIN_URL: {env("DJANGO_ADMIN_URL")}')
 print('#'*60)
 
 
@@ -94,9 +96,12 @@ print('#'*60)
 
 DATABASES = {
     'default': {
-        'ENGINE': 'zappa_django_utils.db.backends.s3sqlite',
-        'NAME': 'sqlite.started-2019-02-08.db',
-        'BUCKET': ZAPPA_SQLITE_BUCKET
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ursula',
+        'USER': 'postgres',
+        'PASSWORD': env('ZAPPA_DATABASE_POSTGRES_PASSWORD'),
+        'HOST': env('ZAPPA_DATABASE_POSTGRES_HOST'),
+        'PORT': '5432',
     }
 }
 
@@ -108,7 +113,7 @@ DATABASES['default']['ATOMIC_REQUESTS'] = True
 # https://github.com/etianen/django-s3-storage
 INSTALLED_APPS += ['django_s3_storage']  # noqa F405
 # zappa-hari-umfrage-s3-access
-AWS_REGION = "eu-west-1"
+AWS_REGION = "eu-central-1"
 AWS_ACCESS_KEY_ID = env('ZAPPA_S3_AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = env('ZAPPA_S3_AWS_SECRET_ACCESS_KEY')
 AWS_S3_BUCKET_NAME = env('ZAPPA_S3_AWS_STORAGE_BUCKET_NAME')

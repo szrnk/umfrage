@@ -75,6 +75,8 @@ The following details how to deploy this application.
 
 zappa update
 
+important to ensure VPC endpoint created for s3 fetch
+
 Test Data
 ---------
 
@@ -86,3 +88,5 @@ References
 ^^^^^^^^^^
 
 https://simpleisbetterthancomplex.com/tutorial/2018/11/28/advanced-form-rendering-with-django-crispy-forms.html
+
+https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/authentication-authrization.html#mutual

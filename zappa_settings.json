@@ -1,12 +1,17 @@
 {
     "dev": {
-        "aws_region": "eu-west-1",
+        "aws_region": "eu-central-1",
         "django_settings": "config.settings.zappadev",
-        "profile_name": "default",
+        "profile_name": "szrnk-root",
         "project_name": "umfrage",
         "runtime": "python3.6",
-        "s3_bucket": "zappa-hari-umfrage-dev",
+        "s3_bucket": "zappa-umfrage-dev",
         "slim_handler": true,
-        "use_precompiled_packages": true
+        "use_precompiled_packages": true,
+        "vpc_config" : {
+            "SubnetIds": [ "subnet-ad9475c7", "subnet-1794c86a", "subnet-a90625e4" ],
+            "SecurityGroupIds": [ "sg-72c63e1c" ]
+        }
+
     }
 }
