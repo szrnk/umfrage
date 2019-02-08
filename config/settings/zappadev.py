@@ -95,7 +95,7 @@ print('#'*60)
 DATABASES = {
     'default': {
         'ENGINE': 'zappa_django_utils.db.backends.s3sqlite',
-        'NAME': 'sqlite.started-2019-02-07.db',
+        'NAME': 'sqlite.started-2019-02-08.db',
         'BUCKET': ZAPPA_SQLITE_BUCKET
     }
 }
