@@ -11,7 +11,8 @@ print('#'*60)
 
 # prefetch the environment variables - must be defined in lambda console
 ZAPPA_DEBUG = env('ZAPPA_DEBUG', default=False)
-ZAPPA_GATEWAY_HOST = env('ZAPPA_GATEWAY_HOST', default='unspecified')
+ZAPPA_GATEWAY_HOST = env('ZAPPA_GATEWAY_HOST', default='BACK-unspecified.com')
+ZAPPA_GATEWAY_HOST_FRONT = env('ZAPPA_GATEWAY_HOST_FRONT', default='FRONT-unspecified.com')
 ZAPPA_SECRET_KEY = env('ZAPPA_SECRET_KEY', default='missing - temp key.. as;dky6yasdkjfytsyAY!Ekhodfkjbasdjfypj12368u$%@(#$^naddflkjh')
 
 
@@ -28,6 +29,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 ALLOWED_HOSTS += [ZAPPA_GATEWAY_HOST]
+ALLOWED_HOSTS += [ZAPPA_GATEWAY_HOST_FRONT]
 
 
 # CACHES

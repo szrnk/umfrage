@@ -11,7 +11,8 @@
         "vpc_config" : {
             "SubnetIds": [ "subnet-ad9475c7", "subnet-1794c86a", "subnet-a90625e4" ],
             "SecurityGroupIds": [ "sg-72c63e1c" ]
-        }
-
+        },
+        "certificate_arn": "arn:aws:acm:us-east-1:289450560826:certificate/cd59dcf9-0b02-4294-8e5b-f8207b96ea91",
+        "domain": "umfdev01.rescuemed.org"
     }
 }
