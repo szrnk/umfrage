@@ -1,13 +1,16 @@
 from adminsortable2.admin import SortableInlineAdminMixin
 from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
+from dal_select2.widgets import ModelSelect2, ModelSelect2Multiple
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db import models
-from django.forms import Textarea
+from django.forms import Textarea, ModelForm, ModelChoiceField
+from django.conf.urls import url
 from django.urls import reverse
-from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter, \
-    StackedPolymorphicInline, PolymorphicInlineSupportMixin
+
+from polymorphic.admin import (PolymorphicParentModelAdmin, PolymorphicChildModelAdmin,
+    StackedPolymorphicInline, PolymorphicInlineSupportMixin, )
 
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
@@ -85,8 +88,25 @@ class DisplayLogicChildAdmin(PolymorphicChildModelAdmin):
     # )
 
 
+class DisplayByOptionForm(ModelForm):
+
+    class Meta:
+        model = DisplayByOptions
+        fields = ('__all__')
+        widgets = {
+            'trigger_question': ModelSelect2(url='/surveys/trigger_questions', forward=['shown_question']),
+            'options': ModelSelect2Multiple(url='/surveys/linked_options', forward=['trigger_question'])
+        }
+
+    class Media:
+        js = (
+            'linked_data.js',
+        )
+
+
 class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByOptions
+    form = DisplayByOptionForm
 
 
 class DisplayByValueAdmin(DisplayLogicChildAdmin):
@@ -109,6 +129,16 @@ class DisplayLogicInline(StackedPolymorphicInline):
 
     class DisplayByOptionAdminInline(StackedPolymorphicInline.Child):
         model = DisplayByOptions
+        form = DisplayByOptionForm
+
+        class Meta:
+            model = DisplayByOptions
+            fields = ('trigger_question', 'options')
+
+        class Media:
+            js = (
+                'linked_data.js',
+            )
 
     model = DisplayLogic
     fk_name = 'shown_question'
@@ -128,7 +158,6 @@ class QuestionAdmin(EditLinkToParentSection, PolymorphicInlineSupportMixin, admi
     inlines = [OptionInline, DisplayLogicInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("code", "truncated_text")
-    # exclude = ('order', )
     readonly_fields = ("section", "section_edit_link")
     fieldsets = ((None, {"fields": ("section", "section_edit_link", "code", "text", "help_text", "qtype")}),)
     extra = 0

@@ -147,7 +147,7 @@ class DisplayByOptions(DisplayLogic):
     def show(self):
         if self.trigger_question.answer_set.count() == 0:
             return False
-        intersection = self.trigger_question.answer_set.first().options.all().intersection(self.options.all())
+        intersection = self.trigger_question.answer_set.first().options.all().order_by().intersection(self.options.order_by().all())
         return intersection.count()
 
 

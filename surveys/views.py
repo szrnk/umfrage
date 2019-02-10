@@ -1,10 +1,10 @@
+from dal_select2.views import Select2QuerySetView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
-from django.views.generic.edit import FormMixin
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
@@ -151,3 +151,30 @@ class MyInvitationsView(generic.ListView):
 
     def get_queryset(self):
         return self.request.user.invitations.all()
+
+
+class LinkedOptionsView(Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return Option.objects.none()
+        trigger_question = self.forwarded.get('trigger_question', None)
+        qs = Option.objects.all()
+        if trigger_question:
+            qs = qs.filter(question_id=trigger_question)
+        return qs
+
+
+class TriggerQuestionView(Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return Question.objects.none()
+        qs = Question.objects.all()
+        shown_question = self.forwarded.get('shown_question', None)
+        if shown_question:
+            shown_question = int(shown_question)
+            question = Question.objects.filter(id=shown_question).first()
+            survey = question.section.survey
+            qs = qs.filter(section__survey__exact=survey.id).exclude(id__in=[shown_question])
+        if self.q:
+            qs = qs.filter(text__istartswith=self.q)
+        return qs

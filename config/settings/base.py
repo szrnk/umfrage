@@ -66,6 +66,11 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
     'polymorphic',
     # 'django.contrib.humanize', # Handy template tags
+
+    # These must be before admin
+    'dal',
+    'dal_select2',
+
     'django.contrib.admin',
 ]
 THIRD_PARTY_APPS = [

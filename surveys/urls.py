@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .models import Option, Question
 
 app_name = "surveys"
 urlpatterns = [
@@ -10,4 +11,8 @@ urlpatterns = [
     path("current/", views.CurrentSurveyView.as_view(), name="current"),
     path("myinvitations/", views.MyInvitationsView.as_view(), name="myinvitations"),
     # path('<int:question_id>/vote/', views.vote, name='vote'),
+    path('linked_options/', views.LinkedOptionsView.as_view(model=Option), name='linked_options'),
+    path('trigger_questions/', views.TriggerQuestionView.as_view(model=Question), name='trigger_questions'),
 ]
+
+
