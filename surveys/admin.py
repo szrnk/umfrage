@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db import models
-from django.forms import Textarea, ModelForm, ModelChoiceField
+from django.forms import Textarea, ModelForm, ModelChoiceField, CharField
 from django.conf.urls import url
 from django.urls import reverse
 
@@ -104,6 +104,21 @@ class DisplayByOptionForm(ModelForm):
         )
 
 
+class DisplayByValueForm(ModelForm):
+
+    class Meta:
+        model = DisplayByValue
+        fields = ('__all__')
+        widgets = {
+            'trigger_question': ModelSelect2(url='/surveys/trigger_questions', forward=['shown_question']),
+        }
+
+    class Media:
+        js = (
+            'linked_data.js',
+        )
+
+
 class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByOptions
     form = DisplayByOptionForm
@@ -111,6 +126,7 @@ class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
 
 class DisplayByValueAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByValue
+    form = DisplayByValueForm
 
 
 class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
@@ -126,6 +142,7 @@ class DisplayLogicInline(StackedPolymorphicInline):
     """
     class DisplayByValueAdminInline(StackedPolymorphicInline.Child):
         model = DisplayByValue
+        form = DisplayByValueForm
 
     class DisplayByOptionAdminInline(StackedPolymorphicInline.Child):
         model = DisplayByOptions
