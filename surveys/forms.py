@@ -101,7 +101,10 @@ class FlexiForm(forms.Form):
         if self.option_field:
             option_ids = self.cleaned_data[self.field_name]
             if type(option_ids) == str:
-                option_ids = [option_ids]
+                if bool(option_ids):
+                    option_ids = [option_ids]
+                else:
+                    option_ids = []
             option_ids = [int(oid) for oid in option_ids]
             options = Option.objects.filter(id__in=option_ids)
         else:
