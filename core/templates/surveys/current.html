@@ -11,7 +11,7 @@
   {% else %}
 
     <h2>Survey: {{ survey.name }}</h2>
-    <h3>Department: {{ department.name }} of Hospital: {{ department.hospital }}</h3>
+    <h3>{{ department.name }} - {{ department.hospital }}</h3>
 
     <div id="accordion">
       {% for section in survey.sections %}
