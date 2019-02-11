@@ -183,7 +183,7 @@ def pet_survey(surveyname=None):
     # interest in animals?
     int_in_animals = QuestionFactory(
         section=se,
-        text=f"Are you interested in animals",
+        text=f"Are you interested in animals?",
         qtype='SINGLECHOICE'
     )
     int_yes = OptionFactory(question=int_in_animals, text=f"Yes")
@@ -192,7 +192,7 @@ def pet_survey(surveyname=None):
     # have pets?
     have_pets = QuestionFactory(
         section=se,
-        text=f"Do you have pets",
+        text=f"Do you have pets?",
         qtype='SINGLECHOICE'
     )
     have_pets_yes = OptionFactory(question=have_pets, text=f"Yes")
