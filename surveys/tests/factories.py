@@ -90,37 +90,6 @@ def basic_survey_structure(surveyname=None):
     return surveys
 
 
-# def tight_survey_structure(surveyname=None):
-#     # allow a one-shot survey name
-#     if surveyname is not None:
-#         survey_kwargs = dict(name=surveyname)
-#     else:
-#         survey_kwargs = dict()
-#
-#     surveys = []
-#     for sui in range(2):
-#         su = SurveyFactory(**survey_kwargs)
-#         survey_kwargs = dict()
-#         for sei in range(4):
-#             se = SectionFactory(survey=su, title=f"this is section {sei}")
-#             for qui in range(4):
-#                 qu = QuestionFactory(
-#                     section=se,
-#                     text=f"text for question {qui}, with original order {qui}",
-#                 )
-#                 for opi in range(4):
-#                     _ = OptionFactory(question=qu, text=f"text for option {opi}")
-#
-#         # Make the second question in the first section a multi, for later tests
-#         section = su.section_set.first()
-#         second = section.question_set.all()[1]
-#         second.qtype = 'MULTICHOICE'
-#         second.save()
-#
-#         surveys.append(su)
-#     return surveys
-
-
 def tight_survey_structure(surveyname=None):
     # allow a one-shot survey name
     if surveyname is not None:
@@ -200,3 +169,86 @@ def tight_survey_structure(surveyname=None):
 
         surveys.append(su)
     return surveys
+
+
+def pet_survey(surveyname=None):
+    # allow a one-shot survey name
+    if surveyname is not None:
+        survey_kwargs = dict(name=surveyname)
+    else:
+        survey_kwargs = dict()
+    su = SurveyFactory(**survey_kwargs)
+    se = SectionFactory(survey=su, title=f"Pet Interest Questions")
+
+    # interest in animals?
+    int_in_animals = QuestionFactory(
+        section=se,
+        text=f"Are you interested in animals",
+        qtype='SINGLECHOICE'
+    )
+    int_yes = OptionFactory(question=int_in_animals, text=f"Yes")
+    OptionFactory(question=int_in_animals, text=f"No")
+
+    # have pets?
+    have_pets = QuestionFactory(
+        section=se,
+        text=f"Do you have pets",
+        qtype='SINGLECHOICE'
+    )
+    have_pets_yes = OptionFactory(question=have_pets, text=f"Yes")
+    OptionFactory(question=have_pets, text=f"No")
+
+    # which pets?
+    which_pets = QuestionFactory(
+        section=se,
+        text=f"Which pets do you share your love with?",
+        qtype='MULTICHOICE'
+    )
+    which_cat_option = OptionFactory(question=which_pets, text=f"One or more cats")
+    OptionFactory(question=which_pets, text=f"One or more dogs")
+    OptionFactory(question=which_pets, text=f"One or more goldfish")
+
+    # how many cats?
+    how_many_cats = QuestionFactory(
+        section=se,
+        text=f"How many cats are your friends?",
+        qtype='INTEGER'
+    )
+
+    # fewer than than 2
+    happy_with_few = QuestionFactory(
+        section=se,
+        text=f"Want more cats?",
+        qtype='SINGLECHOICE'
+    )
+    OptionFactory(question=happy_with_few, text=f"Yes")
+    OptionFactory(question=happy_with_few, text=f"No")
+
+    # more than 5
+    more_than_five = QuestionFactory(
+        section=se,
+        text=f"Do you run a cat sanctuary?",
+        qtype='SINGLECHOICE'
+    )
+    OptionFactory(question=more_than_five, text=f"Yes")
+    OptionFactory(question=more_than_five, text=f"No")
+
+
+    int_in_animals_to_have_pets =\
+        DisplayByOptionsFactory(shown_question=have_pets, trigger_question=int_in_animals)
+    int_in_animals_to_have_pets.options.add(int_yes)
+
+    have_pets_to_which_pets =\
+        DisplayByOptionsFactory(shown_question=which_pets, trigger_question=have_pets)
+    have_pets_to_which_pets.options.add(have_pets_yes)
+
+    which_pets_cats_to_how_many_cats =\
+        DisplayByOptionsFactory(shown_question=how_many_cats, trigger_question=which_pets)
+    which_pets_cats_to_how_many_cats.options.add(which_cat_option)
+
+    DisplayByValueFactory(shown_question=happy_with_few, trigger_question=how_many_cats, value='2', condition="<=")
+    DisplayByValueFactory(shown_question=more_than_five, trigger_question=how_many_cats, value='5', condition=">=")
+
+
+
+
