@@ -35,7 +35,7 @@
                       {{ the_form | crispy }}
                       <input class="btn btn-primary btn-sm" type="submit" value="Submit">
                       {% if request.user.is_superuser %}
-                        <a href="{% url 'admin:surveys_question_change' question.id %}">Edit question</a>
+                        <a href="{% url 'admin:surveys_question_change' question.id %}" class="text-muted">Edit question</a>
                       {% endif %}
                     </form>
                   </div>
