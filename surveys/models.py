@@ -9,7 +9,7 @@ from .managers import QuestionQuerySet
 
 
 class Survey(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
 
     class Meta:
         ordering = ["-name"]
