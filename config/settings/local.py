@@ -66,10 +66,11 @@ INSTALLED_APPS += ['behave_django']  # noqa F405
 # ------------------------------------------------------------------------------
 INSTALLED_APPS += ['zappa_django_utils']
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'sqlite3.db',
+if 0:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'sqlite3.db',
+        }
     }
-}
-DATABASES['default']['ATOMIC_REQUESTS'] = True
+    DATABASES['default']['ATOMIC_REQUESTS'] = True
