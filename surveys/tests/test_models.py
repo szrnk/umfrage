@@ -11,8 +11,8 @@ pytestmark = pytest.mark.django_db
 
 def test_option_parentage(option: Option):
     assert option.question is not None
-    assert option.question.section is not None
-    assert option.question.section.survey is not None
+    assert option.question.parent_section is not None
+    assert option.question.parent_section.survey is not None
 
 
 class TestDisplayLogic:
@@ -21,14 +21,14 @@ class TestDisplayLogic:
         dep = DepartmentFactory()
         su = SurveyFactory()
         se = SectionFactory(survey=su)
-        trigger_question = QuestionFactory(section=se, text='trigger')
+        trigger_question = QuestionFactory(parent_section=se, text='trigger')
         last_option = None
         first_option = None
         for opi in range(4):
             last_option = OptionFactory(question=trigger_question)
             if not first_option:
                 first_option = last_option
-        shown_element = QuestionFactory(section=se, text='show')
+        shown_element = QuestionFactory(parent_section=se, text='show')
         dl = DisplayByOptionsFactory(trigger_question=trigger_question, shown_element=shown_element)
         dl.options.add(last_option)
 
@@ -50,8 +50,8 @@ class TestDisplayLogic:
         dep = DepartmentFactory()
         su = SurveyFactory()
         se = SectionFactory(survey=su)
-        trigger_question = QuestionFactory(section=se, text='trigger')
-        shown_element = QuestionFactory(section=se, text='show')
+        trigger_question = QuestionFactory(parent_section=se, text='trigger')
+        shown_element = QuestionFactory(parent_section=se, text='show')
         dl = DisplayByValueFactory(trigger_question=trigger_question, shown_element=shown_element, value='42', condition='==')
 
         # not yet triggered - no answer

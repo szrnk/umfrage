@@ -23,7 +23,7 @@ class SectionFactory(DjangoModelFactory):
 
 
 class QuestionFactory(DjangoModelFactory):
-    section = SubFactory(SectionFactory)
+    parent_section = SubFactory(SectionFactory)
     code = Sequence(lambda n: "QCode%03d" % n)
     text = Faker("sentence", nb_words=30)
     order = Sequence(lambda n: n)
@@ -74,7 +74,7 @@ def several_long_surveys(surveyname=None):
         for sei in range(4):
             se = SectionFactory(survey=su)
             for qui in range(4):
-                qu = QuestionFactory(section=se)
+                qu = QuestionFactory(parent_section=se)
                 for opi in range(4):
                     _ = OptionFactory(question=qu)
 
@@ -107,7 +107,7 @@ def several_tight_surveys(surveyname=None):
             # first question
             qui = 0
             qu = QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Single Choice",
                 qtype='SINGLECHOICE'
 
@@ -118,7 +118,7 @@ def several_tight_surveys(surveyname=None):
             # second question
             qui = 1
             qu = QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Multiple Choice",
                 qtype='MULTICHOICE'
             )
@@ -128,7 +128,7 @@ def several_tight_surveys(surveyname=None):
             # third question
             qui = 2
             qu = QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Select (Dropdown)",
                 qtype='SELECT'
             )
@@ -138,7 +138,7 @@ def several_tight_surveys(surveyname=None):
             # fourth question
             qui = 3
             QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Text input",
                 qtype='TEXT'
             )
@@ -146,7 +146,7 @@ def several_tight_surveys(surveyname=None):
             # fifth question
             qui = 4
             QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Essay input",
                 qtype='ESSAY'
             )
@@ -154,7 +154,7 @@ def several_tight_surveys(surveyname=None):
             # sixth question
             qui = 5
             QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Integer input",
                 qtype='INTEGER'
             )
@@ -162,7 +162,7 @@ def several_tight_surveys(surveyname=None):
             # seventh question
             qui = 6
             QuestionFactory(
-                section=se,
+                parent_section=se,
                 text=f"text for question {qui}, with original order {qui} - Email input",
                 qtype='EMAIL'
             )
@@ -182,7 +182,7 @@ def pet_survey(surveyname=None):
 
     # interest in animals?
     int_in_animals = QuestionFactory(
-        section=se,
+        parent_section=se,
         text=f"Are you interested in animals?",
         qtype='SINGLECHOICE'
     )
@@ -191,7 +191,7 @@ def pet_survey(surveyname=None):
 
     # have pets?
     have_pets = QuestionFactory(
-        section=se,
+        parent_section=se,
         text=f"Do you have pets?",
         qtype='SINGLECHOICE'
     )
@@ -200,7 +200,7 @@ def pet_survey(surveyname=None):
 
     # which pets?
     which_pets = QuestionFactory(
-        section=se,
+        parent_section=se,
         text=f"Which pets do you share your love with?",
         qtype='MULTICHOICE'
     )
@@ -210,14 +210,14 @@ def pet_survey(surveyname=None):
 
     # how many cats?
     how_many_cats = QuestionFactory(
-        section=se,
+        parent_section=se,
         text=f"How many cats are your friends?",
         qtype='INTEGER'
     )
 
     # fewer than than 2
     happy_with_few = QuestionFactory(
-        section=se,
+        parent_section=se,
         text=f"Want more cats?",
         qtype='SINGLECHOICE'
     )
@@ -226,7 +226,7 @@ def pet_survey(surveyname=None):
 
     # more than 5
     more_than_five = QuestionFactory(
-        section=se,
+        parent_section=se,
         text=f"Do you run a cat sanctuary?",
         qtype='SINGLECHOICE'
     )

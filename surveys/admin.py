@@ -184,6 +184,7 @@ class QuestionInline(
     SortableInlineAdminMixin, EditLinkToInlineObject, admin.StackedInline
 ):
     model = Question
+    fk_name = "parent_section"
     extra = 0
     exclude = ("code",)
     readonly_fields = ("edit_link",)

@@ -21,7 +21,13 @@ class Survey(models.Model):
         return self.section_set.all()
 
 
-class Section(models.Model):
+class Element(PolymorphicModel):
+
+    def __str__(self):
+        return f"E: {self.id}"
+
+
+class Section(Element):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
     # Name is for the survey developer only
     name = models.CharField(max_length=100)
@@ -47,14 +53,14 @@ TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELE
                 ("ESSAY", "Essay"), ("INTEGER", "Integer"), ("EMAIL", "Email"),)
 
 
-class Question(models.Model):
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+class Question(Element):
+    parent_section = models.ForeignKey(Section, on_delete=models.CASCADE)
     code = models.CharField(max_length=40)
     text = models.TextField(blank=True)
     help_text = models.TextField(blank=True)
     qtype = models.CharField(max_length=20, choices=TYPE_CHOICES, default="SINGLECHOICE")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
-    objects = QuestionQuerySet.as_manager()
+    objects = QuestionQuerySet()
 
     def options(self):
         return self.option_set.all()
@@ -77,7 +83,7 @@ class Question(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return self.truncated_text()
+        return f'Q: {self.truncated_text()}'
 
 
 class Option(models.Model):
@@ -137,7 +143,7 @@ def NON_POLYMORPHIC_CASCADE(collector, field, sub_objs, using):
 
 
 class DisplayLogic(PolymorphicModel):
-    shown_element = models.ForeignKey('Question', related_name='trigger_questions', null=True,
+    shown_element = models.ForeignKey('Element', related_name='trigger_questions', null=True,
                                        on_delete=NON_POLYMORPHIC_CASCADE)
     trigger_question = models.ForeignKey('Question',  related_name='shown_element', null=True,
                                          on_delete=NON_POLYMORPHIC_CASCADE)
