@@ -94,7 +94,7 @@ class DisplayByOptionForm(ModelForm):
         model = DisplayByOptions
         fields = ('__all__')
         widgets = {
-            'trigger_question': ModelSelect2(url='/surveys/trigger_questions', forward=['shown_question']),
+            'trigger_question': ModelSelect2(url='/surveys/trigger_questions', forward=['shown_element']),
             'options': ModelSelect2Multiple(url='/surveys/linked_options', forward=['trigger_question'])
         }
 
@@ -110,7 +110,7 @@ class DisplayByValueForm(ModelForm):
         model = DisplayByValue
         fields = ('__all__')
         widgets = {
-            'trigger_question': ModelSelect2(url='/surveys/trigger_questions', forward=['shown_question']),
+            'trigger_question': ModelSelect2(url='/surveys/trigger_questions', forward=['shown_element']),
         }
 
     class Media:
@@ -158,7 +158,7 @@ class DisplayLogicInline(StackedPolymorphicInline):
             )
 
     model = DisplayLogic
-    fk_name = 'shown_question'
+    fk_name = 'shown_element'
     child_inlines = (
         DisplayByValueAdminInline,
         DisplayByOptionAdminInline,

@@ -137,13 +137,13 @@ def NON_POLYMORPHIC_CASCADE(collector, field, sub_objs, using):
 
 
 class DisplayLogic(PolymorphicModel):
-    shown_question = models.ForeignKey('Question', related_name='trigger_questions', null=True,
+    shown_element = models.ForeignKey('Question', related_name='trigger_questions', null=True,
                                        on_delete=NON_POLYMORPHIC_CASCADE)
-    trigger_question = models.ForeignKey('Question',  related_name='shown_question', null=True,
+    trigger_question = models.ForeignKey('Question',  related_name='shown_element', null=True,
                                          on_delete=NON_POLYMORPHIC_CASCADE)
 
     def __str__(self):
-        return f"DiLog {self.trigger_question.id} triggers {self.shown_question.id}"
+        return f"DiLog {self.trigger_question.id} triggers {self.shown_element.id}"
 
 
 class DisplayByOptions(DisplayLogic):

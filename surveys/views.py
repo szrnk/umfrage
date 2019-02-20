@@ -169,12 +169,12 @@ class TriggerQuestionView(Select2QuerySetView):
         if not self.request.user.is_staff:
             return Question.objects.none()
         qs = Question.objects.all()
-        shown_question = self.forwarded.get('shown_question', None)
-        if shown_question:
-            shown_question = int(shown_question)
-            question = Question.objects.filter(id=shown_question).first()
+        shown_element = self.forwarded.get('shown_element', None)
+        if shown_element:
+            shown_element = int(shown_element)
+            question = Question.objects.filter(id=shown_element).first()
             survey = question.section.survey
-            qs = qs.filter(section__survey__exact=survey.id).exclude(id__in=[shown_question])
+            qs = qs.filter(section__survey__exact=survey.id).exclude(id__in=[shown_element])
         if self.q:
             qs = qs.filter(text__istartswith=self.q)
         return qs

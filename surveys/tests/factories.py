@@ -44,7 +44,7 @@ class OptionFactory(DjangoModelFactory):
 
 class DisplayByOptionsFactory(DjangoModelFactory):
     trigger_question = SubFactory(QuestionFactory)
-    shown_question = SubFactory(QuestionFactory)
+    shown_element = SubFactory(QuestionFactory)
 
     class Meta:
         model = DisplayByOptions
@@ -52,7 +52,7 @@ class DisplayByOptionsFactory(DjangoModelFactory):
 
 class DisplayByValueFactory(DjangoModelFactory):
     trigger_question = SubFactory(QuestionFactory)
-    shown_question = SubFactory(QuestionFactory)
+    shown_element = SubFactory(QuestionFactory)
     value = 0
     condition = '=='
 
@@ -234,19 +234,19 @@ def pet_survey(surveyname=None):
     OptionFactory(question=more_than_five, text=f"No")
 
     int_in_animals_to_have_pets =\
-        DisplayByOptionsFactory(shown_question=have_pets, trigger_question=int_in_animals)
+        DisplayByOptionsFactory(shown_element=have_pets, trigger_question=int_in_animals)
     int_in_animals_to_have_pets.options.add(int_yes)
 
     have_pets_to_which_pets =\
-        DisplayByOptionsFactory(shown_question=which_pets, trigger_question=have_pets)
+        DisplayByOptionsFactory(shown_element=which_pets, trigger_question=have_pets)
     have_pets_to_which_pets.options.add(have_pets_yes)
 
     which_pets_cats_to_how_many_cats =\
-        DisplayByOptionsFactory(shown_question=how_many_cats, trigger_question=which_pets)
+        DisplayByOptionsFactory(shown_element=how_many_cats, trigger_question=which_pets)
     which_pets_cats_to_how_many_cats.options.add(which_cat_option)
 
-    DisplayByValueFactory(shown_question=happy_with_few, trigger_question=how_many_cats, value='2', condition="<=")
-    DisplayByValueFactory(shown_question=more_than_five, trigger_question=how_many_cats, value='5', condition=">=")
+    DisplayByValueFactory(shown_element=happy_with_few, trigger_question=how_many_cats, value='2', condition="<=")
+    DisplayByValueFactory(shown_element=more_than_five, trigger_question=how_many_cats, value='5', condition=">=")
 
     return su
 
