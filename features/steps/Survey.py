@@ -321,7 +321,7 @@ def step_impl(context, surveyname):
     assert len(els) == 0
     els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
     assert len(els) == 0
-    els = br.find_elements_by_xpath("//div[@id='question_3']//form//option")
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//option")
     assert len(els) == 4
     assert all([el.text.startswith('text') for el in els])
 
