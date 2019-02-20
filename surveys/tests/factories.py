@@ -60,7 +60,7 @@ class DisplayByValueFactory(DjangoModelFactory):
         model = DisplayByValue
 
 
-def basic_survey_structure(surveyname=None):
+def several_long_surveys(surveyname=None):
     # allow a one-shot survey name
     if surveyname is not None:
         survey_kwargs = dict(name=surveyname)
@@ -90,7 +90,7 @@ def basic_survey_structure(surveyname=None):
     return surveys
 
 
-def tight_survey_structure(surveyname=None):
+def several_tight_surveys(surveyname=None):
     # allow a one-shot survey name
     if surveyname is not None:
         survey_kwargs = dict(name=surveyname)
@@ -233,7 +233,6 @@ def pet_survey(surveyname=None):
     OptionFactory(question=more_than_five, text=f"Yes")
     OptionFactory(question=more_than_five, text=f"No")
 
-
     int_in_animals_to_have_pets =\
         DisplayByOptionsFactory(shown_question=have_pets, trigger_question=int_in_animals)
     int_in_animals_to_have_pets.options.add(int_yes)
@@ -249,6 +248,7 @@ def pet_survey(surveyname=None):
     DisplayByValueFactory(shown_question=happy_with_few, trigger_question=how_many_cats, value='2', condition="<=")
     DisplayByValueFactory(shown_question=more_than_five, trigger_question=how_many_cats, value='5', condition=">=")
 
+    return su
 
 
 

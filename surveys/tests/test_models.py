@@ -3,7 +3,8 @@ import pytest
 from correspondents.tests.factories import DepartmentFactory
 from surveys.models import Option, Survey, DisplayByOptions, Answer, Value
 from surveys.tests.factories import SurveyFactory, SectionFactory, QuestionFactory, OptionFactory, DisplayByOptionsFactory, \
-    DisplayByValueFactory
+    DisplayByValueFactory, pet_survey, several_long_surveys, several_tight_surveys
+from django.core.management import call_command
 
 pytestmark = pytest.mark.django_db
 
@@ -101,6 +102,20 @@ class TestDisplayLogic:
         ans.value = Value.objects.create(text='PPPPPP')
         ans.save()
         assert(not shown_question.triggered())
+
+    def test_creation_and_deletion_pet_survey(self):
+        psu = pet_survey(f"Pet Survey 1")
+        psu.delete()
+
+    def test_creation_and_deletion_basic_survey(self):
+        surveys = several_long_surveys(f"Survey 1")
+        for survey in surveys:
+            survey.delete()
+
+    def test_creation_and_deletion_tight_surveys(self):
+        surveys = several_tight_surveys(f"Survey 1")
+        for survey in surveys:
+            survey.delete()
 
 
 
