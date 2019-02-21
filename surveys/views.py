@@ -168,14 +168,19 @@ class TriggerQuestionView(Select2QuerySetView):
         qs = Element.objects.none()
         if shown_element:
             shown_element = int(shown_element)
-
             question = Question.objects.filter(id=shown_element).first()
             if question is not None:
                 survey = question.parent_section.survey
             else:
                 section = Section.objects.filter(id=shown_element).first()
                 survey = section.survey
-            qs = Question.objects.filter(parent_section__survey__exact=survey.id).exclude(id__in=[shown_element])
+            question_type = self.kwargs.get('type', None)
+            qs = Question.objects.filter(parent_section__survey__exact=survey.id)
+            if question_type == 'options':
+                qs = qs.filter(qtype__in=["SINGLECHOICE", "MULTICHOICE", "SELECT"])
+            elif question_type == 'value':
+                qs = qs.filter(qtype__in=["TEXT", "ESSAY", "INTEGER", "EMAIL"])
+            qs.exclude(id__in=[shown_element])
             if self.q:
                 qs = qs.filter(text__istartswith=self.q)
         return qs

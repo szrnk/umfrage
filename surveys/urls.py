@@ -12,7 +12,8 @@ urlpatterns = [
     path("myinvitations/", views.MyInvitationsView.as_view(), name="myinvitations"),
     # path('<int:question_id>/vote/', views.vote, name='vote'),
     path('linked_options/', views.LinkedOptionsView.as_view(model=Option), name='linked_options'),
-    path('trigger_questions/', views.TriggerQuestionView.as_view(model=Question), name='trigger_questions'),
+    path('trigger_questions_options/', views.TriggerQuestionView.as_view(model=Question), name='trigger_questions', kwargs=dict(type='options')),
+    path('trigger_questions_value/', views.TriggerQuestionView.as_view(model=Question), name='trigger_questions', kwargs=dict(type='value')),
 ]
 
 
