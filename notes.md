@@ -18,7 +18,6 @@ zappa manage dev "collectstatic --noinput"
 
  533  zappa update
   534  zappa tail 
-  535  zappa manage migrate
   536  zappa manage dev migrate
  zappa manage dev create_basic_hospital_structure Alexandra-Clinic Emergency-Department
  zappa manage dev create_sample_surveys 

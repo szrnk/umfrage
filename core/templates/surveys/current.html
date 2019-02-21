@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load survey_extras %}
 {% load crispy_forms_tags %}
+{% load static %}
+
 
 {% block content %}
   {% if not survey %}
@@ -34,7 +36,7 @@
                       </div>
                     {% endwith %}
                     <div class="p-2"><a href="{% url 'admin:surveys_section_change' section.id %}" class="operator-notes">
-                      <img class="operator-icon" src="/static/images/round-edit-24px.svg"/></a>
+                      <img class="operator-icon" src="{% static 'images/round-edit-24px.svg' %}"/></a>
                     </div>
                   {% endif %}
 
@@ -59,7 +61,7 @@
                               <div class="p-2">{% include "surveys/outbound_triggers.html" %}</div>
                             {% endwith %}
                             <div class="p-2"><a href="{% url 'admin:surveys_question_change' question.id %}" class="operator-notes">
-                              <img class="operator-icon" src="/static/images/round-edit-24px.svg"/></a>
+                      <img class="operator-icon" src="{% static 'images/round-edit-24px.svg' %}"/></a>
                             </div>
                           {% endif %}
                         </div>
