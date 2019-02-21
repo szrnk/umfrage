@@ -267,6 +267,7 @@ def interest_survey(surveyname=None):
     int_in_animals = QuestionFactory(
         parent_section=se_ov,
         text=f"What interests you more?",
+        help_text="You can regard this as a proxy for a more general choice between the animate and the mechanical worlds.",
         qtype='SINGLECHOICE'
     )
     int_yes = OptionFactory(question=int_in_animals, text=f"Animals")
@@ -279,6 +280,7 @@ def interest_survey(surveyname=None):
     have_pets = QuestionFactory(
         parent_section=se_pe,
         text=f"Do you have pets?",
+        help_text='Here we are mostly concerned about domestic animals you may have in your home.',
         qtype='SINGLECHOICE'
     )
     have_pets_yes = OptionFactory(question=have_pets, text=f"Yes")

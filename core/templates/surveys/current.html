@@ -19,11 +19,26 @@
           <div class="card">
             <div class="card-header" id="section_{{ section.id }}">
               <h5 class="mb-0">
-                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
-                        aria-expanded="true"
-                        aria-controls="collapseOne">
-                  {{ section.title }}
-                </button>
+                <div class="d-flex">
+                  <div class="mr-auto p-2">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
+                            aria-expanded="true"
+                            aria-controls="collapseOne">
+                      {{ section.title }}
+                    </button>
+                  </div>
+                  {% if request.user.is_superuser %}
+                    {% with element=section %}
+                      <div class="p-2">
+                        {% include "surveys/inbound_triggers.html" %}
+                      </div>
+                    {% endwith %}
+                    <div class="p-2"><a href="{% url 'admin:surveys_section_change' section.id %}" class="operator-notes">
+                      <img class="operator-icon" src="/static/images/round-edit-24px.svg"/></a>
+                    </div>
+                  {% endif %}
+
+                </div>
               </h5>
             </div>
             <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}"
@@ -36,10 +51,18 @@
                         {% csrf_token %}
                         {% get_survey_question_form survey department question as the_form %}
                         {{ the_form | crispy }}
-                        <input class="btn btn-primary btn-sm" type="submit" value="Submit">
-                        {% if request.user.is_superuser %}
-                          <a href="{% url 'admin:surveys_question_change' question.id %}" class="text-muted">Edit question</a>
-                        {% endif %}
+                        <div class="d-flex">
+                          <div class="mr-auto p-2"><input class="btn btn-primary btn-sm" type="submit" value="Submit"></div>
+                          {% if request.user.is_superuser %}
+                            {% with element=question %}
+                              <div class="p-2">{% include "surveys/inbound_triggers.html" %}</div>
+                              <div class="p-2">{% include "surveys/outbound_triggers.html" %}</div>
+                            {% endwith %}
+                            <div class="p-2"><a href="{% url 'admin:surveys_question_change' question.id %}" class="operator-notes">
+                              <img class="operator-icon" src="/static/images/round-edit-24px.svg"/></a>
+                            </div>
+                          {% endif %}
+                        </div>
                       </form>
                     </div>
                   {% endif %}
@@ -47,7 +70,29 @@
               </div>
             </div>
           </div>
+        {% elif request.user.is_superuser %}
+          <div class="card">
+            <div class="card-header" id="section_{{ section.id }}">
+              <h5 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
+                        aria-expanded="true"
+                        aria-controls="collapseOne">
+                  {{ section.title }} - conditional
+                </button>
+              </h5>
+            </div>
+            <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}"
+                 data-parent="#accordion">
+              <div class="card-body">
+                {% for question in section.questions %}
+                  {{ question.text }}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
         {% endif %}
+
       {% endfor %}
     </div>
 

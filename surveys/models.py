@@ -23,12 +23,22 @@ class Survey(models.Model):
 
 class Element(PolymorphicModel):
 
+    def short_signifier(self):
+        return 'element'
+
+    def inbound_triggers(self):
+        return ""
+
+    def outbound_triggers(self):
+        return ""
+
     def __str__(self):
         return f"E: {self.id}"
 
 
 class Section(Element):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    code = models.CharField(max_length=40)
     # Name is for the survey developer only
     name = models.CharField(max_length=100)
     # Title is used on frontend - and to be internationalised
@@ -51,6 +61,17 @@ class Section(Element):
             return True
         # Trigger if there are any dependencies that match
         return any(q.show() for q in self.trigger_questions.all())
+
+    def short_signifier(self):
+        return 'section'
+
+    def inbound_triggers(self):
+        ret = []
+        for tq in self.trigger_questions.all():
+            code = tq.trigger_question.code
+            text = tq.trigger_question.truncated_text()
+            ret += [dict(code=code, text=text)]
+        return ret
 
     def number_of_questions(self):
         return len(self.questions())
@@ -84,6 +105,28 @@ class Question(Element):
             return True
         # Trigger if there are any dependencies that match
         return any(q.show() for q in self.trigger_questions.all())
+
+    def short_signifier(self):
+        return 'question'
+
+    def inbound_triggers(self):
+        ret = []
+        for tq in self.trigger_questions.all():
+            code = tq.trigger_question.code
+            text = tq.trigger_question.truncated_text()
+            ret += [dict(code=code, text=text)]
+        return ret
+
+    def outbound_triggers(self):
+        ret = []
+        for se in self.shown_element.all():
+            code = se.shown_element.code
+            if hasattr(se.shown_element, 'truncated_text'):
+                text = se.shown_element.truncated_text()
+            else:
+                text = se.shown_element.title
+            ret += [dict(code=code, text=text)]
+        return ret
 
     class Meta:
         # order must be first
@@ -146,6 +189,9 @@ class Invitation(models.Model):
 
 
 def NON_POLYMORPHIC_CASCADE(collector, field, sub_objs, using):
+    """
+    https://github.com/django-polymorphic/django-polymorphic/issues/229#issuecomment-398434412
+    """
     return models.CASCADE(collector, field, sub_objs.non_polymorphic(), using)
 
 
@@ -156,7 +202,7 @@ class DisplayLogic(PolymorphicModel):
                                          on_delete=NON_POLYMORPHIC_CASCADE)
 
     def __str__(self):
-        return f"DiLog {self.trigger_question.id} triggers {self.shown_element.id}"
+        return f"DiLog q:{self.trigger_question.id} triggers {self.shown_element.short_signifier()[0]}:{self.shown_element.id}"
 
 
 class DisplayByOptions(DisplayLogic):
