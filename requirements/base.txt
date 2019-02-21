@@ -18,6 +18,7 @@ django-s3-storage==0.12.4
 django-admin-sortable2==0.6.21
 django-polymorphic==2.0.3
 django-autocomplete-light==3.3.2
+django-extensions==2.1.4  # https://github.com/django-extensions/django-extensions
 
 
 # Django REST Framework

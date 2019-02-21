@@ -20,9 +20,13 @@ zappa manage dev "collectstatic --noinput"
   534  zappa tail 
   535  zappa manage migrate
   536  zappa manage dev migrate
-  538  zappa manage dev create_basic_hospital_structure Alexandra-Clinic Emergency-Department
-  539  zappa manage dev create_sample_surveys 
+ zappa manage dev create_basic_hospital_structure Alexandra-Clinic Emergency-Department
+ zappa manage dev create_sample_surveys 
 
+
+./manage.py 
+zappa manage dev reset_db --noinput
+zappa manage dev "reset_db --noinput --close-sessions"
 
 ## Run once after adding sortable Mixin
 python manage.py reorder surveys.Option surveys.Question
