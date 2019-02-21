@@ -147,7 +147,8 @@ class Option(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return f'Su:{self.question.parent_section.survey.id} Se: {self.question.parent_section.id} Q:{self.question.id} O:{self.id} ' + Truncator(self.text).chars(20)
+        code = f"<{self.code}>: " if self.code else ''
+        return code + Truncator(self.text).chars(20)
 
 
 class Value(models.Model):
@@ -215,6 +216,9 @@ class DisplayByOptions(DisplayLogic):
         intersection = self.trigger_question.answer_set.first().options.all().order_by().intersection(self.options.order_by().all())
         return intersection.count()
 
+    def __str__(self):
+        return f"DiByOp q:{self.id}"
+
 
 SHOW_LOGIC_CHOICES = (("==", "=="), (">=", ">="), ("<=", "<="), ("contains", "contains"), ("containsNoCase", "containsNoCase"), )
 
@@ -246,6 +250,8 @@ class DisplayByValue(DisplayLogic):
                 return True
         return False
 
+    def __str__(self):
+        return f"DiByVal q:{self.id}"
 
 
 

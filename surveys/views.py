@@ -141,10 +141,6 @@ class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
         form.save()
         return HttpResponseRedirect(self.get_success_url())
 
-    # def form_invalid(self, form):
-    #     """If the form is invalid, render the invalid form."""
-    #     return self.render_to_response(self.get_context_data(form=form))
-
 
 class MyInvitationsView(generic.ListView):
     template_name = "surveys/myinvitations.html"

@@ -35,8 +35,8 @@ class EditLinkToParentSection(object):
         if instance.pk:
             url = reverse(
                 "admin:%s_%s_change"
-                % (instance._meta.app_label, instance.section._meta.model_name),
-                args=[instance.section.pk],
+                % (instance._meta.app_label, instance.parent_section._meta.model_name),
+                args=[instance.parent_section.pk],
             )
             return mark_safe(u'<a href="{u}">edit parent section</a>'.format(u=url))
         else:
@@ -140,6 +140,18 @@ class DisplayLogicInline(StackedPolymorphicInline):
     The actual form appearance of each row is determined by
     the child inline that corresponds with the actual model type.
     """
+    verbose_name_plural = 'Display Conditions'
+    verbose_name = 'Display Condition'
+
+    def __init__(self, parent_model, admin_site):
+        super().__init__(parent_model, admin_site)
+        if self.parent_model == Question:
+            self.verbose_name_plural = self.verbose_name_plural + ' for this Question'
+            self.verbose_name = self.verbose_name + ' for this Question'
+        if self.parent_model == Section:
+            self.verbose_name_plural = self.verbose_name_plural + ' for this Section'
+            self.verbose_name = self.verbose_name + ' for this Section'
+
     class DisplayByValueAdminInline(StackedPolymorphicInline.Child):
         model = DisplayByValue
         form = DisplayByValueForm
@@ -175,8 +187,8 @@ class QuestionAdmin(EditLinkToParentSection, PolymorphicInlineSupportMixin, admi
     inlines = [OptionInline, DisplayLogicInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("code", "truncated_text")
-    readonly_fields = ("section", "section_edit_link")
-    fieldsets = ((None, {"fields": ("section", "section_edit_link", "code", "text", "help_text", "qtype")}),)
+    readonly_fields = ("parent_section", "section_edit_link")
+    fieldsets = ((None, {"fields": ("parent_section", "section_edit_link", "code", "text", "help_text", "qtype")}),)
     extra = 0
 
 
