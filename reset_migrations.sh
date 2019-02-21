@@ -19,5 +19,3 @@ echo "Make migrations"
 ./manage.py makemigrations
 echo "Migrate"
 ./manage.py migrate --settings=config.settings.local
-
-

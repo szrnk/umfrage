@@ -45,6 +45,13 @@ class Section(Element):
     def questions(self):
         return self.question_set.all()
 
+    def triggered(self):
+        # There are no dependencies, so trigger
+        if not self.trigger_questions.all().count():
+            return True
+        # Trigger if there are any dependencies that match
+        return any(q.show() for q in self.trigger_questions.all())
+
     def number_of_questions(self):
         return len(self.questions())
 
@@ -97,7 +104,7 @@ class Option(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return f'Su:{self.question.section.survey.id} Se: {self.question.section.id} Q:{self.question.id} O:{self.id} ' + Truncator(self.text).chars(20)
+        return f'Su:{self.question.parent_section.survey.id} Se: {self.question.parent_section.id} Q:{self.question.id} O:{self.id} ' + Truncator(self.text).chars(20)
 
 
 class Value(models.Model):

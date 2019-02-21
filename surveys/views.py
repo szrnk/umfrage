@@ -8,7 +8,7 @@ from django.views import generic
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
-from surveys.models import Survey, Section, Invitation, Option, Answer, Question
+from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element
 
 from .progress import Progress
 
@@ -168,13 +168,18 @@ class TriggerQuestionView(Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_staff:
             return Question.objects.none()
-        qs = Question.objects.all()
         shown_element = self.forwarded.get('shown_element', None)
+        qs = Element.objects.none()
         if shown_element:
             shown_element = int(shown_element)
+
             question = Question.objects.filter(id=shown_element).first()
-            survey = question.section.survey
-            qs = qs.filter(section__survey__exact=survey.id).exclude(id__in=[shown_element])
-        if self.q:
-            qs = qs.filter(text__istartswith=self.q)
+            if question is not None:
+                survey = question.parent_sectionsection.survey
+            else:
+                section = Section.objects.filter(id=shown_element).first()
+                survey = section.survey
+            qs = Question.objects.filter(parent_section__survey__exact=survey.id).exclude(id__in=[shown_element])
+            if self.q:
+                qs = qs.filter(text__istartswith=self.q)
         return qs

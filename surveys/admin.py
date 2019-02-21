@@ -191,8 +191,8 @@ class QuestionInline(
     formfield_overrides = FORMFIELD_OVERRIDES
 
 
-class SectionAdmin(EditLinkToParentSurvey, admin.ModelAdmin):
-    inlines = [QuestionInline]
+class SectionAdmin(EditLinkToParentSurvey, PolymorphicInlineSupportMixin, admin.ModelAdmin):
+    inlines = [QuestionInline, DisplayLogicInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("name",)
     readonly_fields = ("survey", "survey_edit_link")
