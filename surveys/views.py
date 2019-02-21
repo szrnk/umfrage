@@ -175,7 +175,7 @@ class TriggerQuestionView(Select2QuerySetView):
 
             question = Question.objects.filter(id=shown_element).first()
             if question is not None:
-                survey = question.parent_sectionsection.survey
+                survey = question.parent_section.survey
             else:
                 section = Section.objects.filter(id=shown_element).first()
                 survey = section.survey
