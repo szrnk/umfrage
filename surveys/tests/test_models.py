@@ -3,8 +3,11 @@ import pytest
 from correspondents.tests.factories import DepartmentFactory
 from surveys.models import Option, Survey, DisplayByOptions, Answer, Value
 from surveys.tests.factories import SurveyFactory, SectionFactory, QuestionFactory, OptionFactory, DisplayByOptionsFactory, \
-    DisplayByValueFactory, pet_survey, several_long_surveys, several_tight_surveys
+    DisplayByValueFactory, pet_survey, several_long_surveys, several_tight_surveys, interest_survey, fake_survey_answers, \
+    create_answered_survey
 from django.core.management import call_command
+from datetime import datetime
+
 
 pytestmark = pytest.mark.django_db
 
@@ -117,6 +120,9 @@ class TestDisplayLogic:
         for survey in surveys:
             survey.delete()
 
+    def test_create_answered_survey(self):
+        for i in range(3):
+            create_answered_survey()
 
 
         

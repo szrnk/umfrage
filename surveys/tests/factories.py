@@ -1,6 +1,13 @@
-from factory import DjangoModelFactory, Faker, Sequence, SubFactory
+import random
 
-from ..models import Survey, Section, Question, Option, DisplayByOptions, DisplayByValue
+from factory import DjangoModelFactory, Faker, Sequence, SubFactory
+import factory
+
+from correspondents.models import Department
+from correspondents.tests.factories import DepartmentFactory
+from ..models import Survey, Section, Question, Option, DisplayByOptions, DisplayByValue, Invitation, generate_random_token, OPTION_CHOICES, \
+    Answer, VALUE_CHOICES, Value
+from datetime import datetime
 
 
 class SurveyFactory(DjangoModelFactory):
@@ -14,7 +21,8 @@ class SurveyFactory(DjangoModelFactory):
 class SectionFactory(DjangoModelFactory):
 
     survey = SubFactory(SurveyFactory)
-    name = Sequence(lambda n: "Section %03d" % n)
+    code = Sequence(lambda n: "SeCode%04d" % n)
+    name = Sequence(lambda n: "Section %04d" % n)
     title = Faker("sentence", nb_words=7)
     order = Sequence(lambda n: n)
 
@@ -24,7 +32,7 @@ class SectionFactory(DjangoModelFactory):
 
 class QuestionFactory(DjangoModelFactory):
     parent_section = SubFactory(SectionFactory)
-    code = Sequence(lambda n: "QCode%03d" % n)
+    code = Sequence(lambda n: "QCode%04d" % n)
     text = Faker("sentence", nb_words=30)
     order = Sequence(lambda n: n)
 
@@ -34,7 +42,7 @@ class QuestionFactory(DjangoModelFactory):
 
 class OptionFactory(DjangoModelFactory):
     question = SubFactory(QuestionFactory)
-    code = Sequence(lambda n: "OCode%03d" % n)
+    code = Sequence(lambda n: "OCode%04d" % n)
     text = Faker("sentence", nb_words=10)
     order = Sequence(lambda n: n)
 
@@ -58,6 +66,35 @@ class DisplayByValueFactory(DjangoModelFactory):
 
     class Meta:
         model = DisplayByValue
+
+
+class InvitationFactory(DjangoModelFactory):
+
+    department = SubFactory(Department)
+    survey = SubFactory(Survey)
+    token = Sequence(lambda n: generate_random_token())
+
+    class Meta:
+        model = Invitation
+
+
+class AnswerFactory(DjangoModelFactory):
+
+    question = SubFactory(Question)
+    department = SubFactory(Department)
+
+    @factory.post_generation
+    def options(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        if extracted:
+            for o in extracted:
+                self.options.add(o)
+
+    class Meta:
+        model = Answer
 
 
 def several_long_surveys(surveyname=None):
@@ -300,6 +337,7 @@ def interest_survey(surveyname=None):
     how_many_cats = QuestionFactory(
         parent_section=se_pe,
         text=f"How many cats are your friends?",
+        help_text = '//dict(test_values=[1,3,7])',
         qtype='INTEGER'
     )
 
@@ -355,5 +393,55 @@ def interest_survey(surveyname=None):
     return su
 
 
+def create_invitations(survey, count):
+    for i in range(count):
+        dep = DepartmentFactory()
+        InvitationFactory(survey=survey, department=dep)
+
+
+def answer_question(qu, department):
+    if qu.qtype in OPTION_CHOICES:
+        oset = qu.option_set.all()
+        oset = list(oset)
+        assert len(oset)
+        if qu.qtype == 'MULTICHOICE':
+            options = [] if (len(oset) == 0) else random.sample(oset, 1 if (len(oset) <= 2) else len(oset)-1)
+        else:
+            options = [random.choice(oset)]
+        ans = AnswerFactory.create(question=qu, options=options, department=department)
+    elif qu.qtype in VALUE_CHOICES:
+        helptxt = qu.help_text.split('//')
+        if len(helptxt) > 1:
+            helptxt=helptxt[1]
+            try:
+                vals = eval(helptxt)['test_values']
+            except:
+                vals = None
+        else:
+            vals = None
+        if vals:
+            val = random.choice(vals)
+            ans = AnswerFactory.create(question=qu, department=department)
+            ans.value = Value.objects.create(text=str(val))
+            ans.save()
+
+
+def create_mock_answers(survey):
+    for inv in survey.invitation_set.all():
+        for se in survey.sections():
+            if se.triggered():
+                for qu in se.questions():
+                    if qu.triggered():
+                        answer_question(qu, inv.department)
+
+
+def fake_survey_answers(survey, count):
+    create_invitations(survey, count)
+    create_mock_answers(survey)
+
+
+def create_answered_survey():
+    ints = interest_survey(f"Answered Survey {datetime.now()}")
+    fake_survey_answers(ints, 15)
 
 

@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -79,6 +82,8 @@ class Section(Element):
 
 TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELECT", "Select (Dropdown)"), ("TEXT", "Text"),
                 ("ESSAY", "Essay"), ("INTEGER", "Integer"), ("EMAIL", "Email"),)
+OPTION_CHOICES = ["SINGLECHOICE", "MULTICHOICE", "SELECT"]
+VALUE_CHOICES = ["TEXT", "ESSAY", "INTEGER", "EMAIL"]
 
 
 class Question(Element):
@@ -169,11 +174,11 @@ class Answer(models.Model):
     def __str__(self):
         return f"<Answer {self.id}>"
 
-    # def __repr__(self):
-    #     return f"<Answer {self.pk}> option:{self.option} for {self.question} for {self.department}"
-
 
 def generate_random_token():
+    return '-'.join(('COD', ''.join(
+        random.choices(string.ascii_uppercase  + string.digits, k=4))))
+
     return get_random_string(length=32)
 
 
@@ -231,7 +236,11 @@ class DisplayByValue(DisplayLogic):
         if self.trigger_question.answer_set.count() == 0:
             return False
 
-        avalue = self.trigger_question.answer_set.first().value.text
+        try:
+            qq = self.trigger_question.answer_set.first()
+            avalue = qq.value.text
+        except AttributeError as e:
+            return False
 
         if self.condition == '==':
             if avalue == self.value:

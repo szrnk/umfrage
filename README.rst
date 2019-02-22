@@ -90,3 +90,9 @@ References
 https://simpleisbetterthancomplex.com/tutorial/2018/11/28/advanced-form-rendering-with-django-crispy-forms.html
 
 https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/authentication-authrization.html#mutual
+
+future:
+
+https://github.com/django-import-export/django-import-export
+https://medium.com/@hakibenita/how-to-add-custom-action-buttons-to-django-admin-8d266f5b0d41
+

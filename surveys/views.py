@@ -8,7 +8,7 @@ from django.views import generic
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
-from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element
+from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element, OPTION_CHOICES, VALUE_CHOICES
 
 from .progress import Progress
 
@@ -177,9 +177,9 @@ class TriggerQuestionView(Select2QuerySetView):
             question_type = self.kwargs.get('type', None)
             qs = Question.objects.filter(parent_section__survey__exact=survey.id)
             if question_type == 'options':
-                qs = qs.filter(qtype__in=["SINGLECHOICE", "MULTICHOICE", "SELECT"])
+                qs = qs.filter(qtype__in=OPTION_CHOICES)
             elif question_type == 'value':
-                qs = qs.filter(qtype__in=["TEXT", "ESSAY", "INTEGER", "EMAIL"])
+                qs = qs.filter(qtype__in=VALUE_CHOICES)
             qs.exclude(id__in=[shown_element])
             if self.q:
                 qs = qs.filter(text__istartswith=self.q)
