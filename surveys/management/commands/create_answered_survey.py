@@ -4,9 +4,10 @@ from surveys.tests.factories import create_answered_survey
 
 
 class Command(BaseCommand):
-    help = "Create sample surveys."
+    help = "Create answered surveys."
 
     def handle(self, *args, **options):
-        for i in range(10):
+        N = 5
+        for i in range(N):
             create_answered_survey()
-        self.stdout.write(self.style.SUCCESS("Done"))
+        self.stdout.write(self.style.SUCCESS(f"Done - created {N}"))

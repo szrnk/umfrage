@@ -95,4 +95,4 @@ future:
 
 https://github.com/django-import-export/django-import-export
 https://medium.com/@hakibenita/how-to-add-custom-action-buttons-to-django-admin-8d266f5b0d41
-
+https://code.djangoproject.com/wiki/ModelInterNationalization

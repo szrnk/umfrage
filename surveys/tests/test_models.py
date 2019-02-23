@@ -36,18 +36,18 @@ class TestDisplayLogic:
         dl.options.add(last_option)
 
         # not yet triggered - no answer has been provided
-        assert(not shown_element.triggered())
+        assert(not shown_element.triggered(dep))
 
         ans = Answer.objects.create(question=trigger_question, department=dep)
         ans.options.add(last_option)
 
         # now there is an answer including the option, so the shown_element is triggered
-        assert(shown_element.triggered())
+        assert(shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different option, and the Q is again not triggered
         dl.options.clear()
         dl.options.add(first_option)
-        assert(not shown_element.triggered())
+        assert(not shown_element.triggered(dep))
 
     def test_display_by_value_conditions(self):
         dep = DepartmentFactory()
@@ -58,37 +58,37 @@ class TestDisplayLogic:
         dl = DisplayByValueFactory(trigger_question=trigger_question, shown_element=shown_element, value='42', condition='==')
 
         # not yet triggered - no answer
-        assert(not shown_element.triggered())
+        assert(not shown_element.triggered(dep))
 
         ans = Answer.objects.create(question=trigger_question, department=dep)
         ans.value = Value.objects.create(text='42')
         ans.save()
 
         # now there is an answer including the option, so the shown_element is triggered
-        assert(shown_element.triggered())
+        assert(shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different value, and the Q is again not triggered
         dl.value = '43'
         dl.save()
-        assert(not shown_element.triggered())
+        assert(not shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different condition
         dl.condition = '<='
         dl.save()
-        assert(shown_element.triggered())
+        assert(shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different condition
         dl.condition = '>='
         dl.save()
         ans.value = Value.objects.create(text='44')
         ans.save()
-        assert(shown_element.triggered())
+        assert(shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different condition
         dl.condition = 'contains'
         dl.value = '4'
         dl.save()
-        assert(shown_element.triggered())
+        assert(shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different condition
         dl.condition = 'containsNoCase'
@@ -96,7 +96,7 @@ class TestDisplayLogic:
         dl.save()
         ans.value = Value.objects.create(text='XXYABCDEFG')
         ans.save()
-        assert(shown_element.triggered())
+        assert(shown_element.triggered(dep))
 
         # now let's change the dl, to trigger on a different condition
         dl.condition = 'containsNoCase'
@@ -104,30 +104,4 @@ class TestDisplayLogic:
         dl.save()
         ans.value = Value.objects.create(text='PPPPPP')
         ans.save()
-        assert(not shown_element.triggered())
-
-    def test_creation_and_deletion_pet_survey(self):
-        psu = pet_survey(f"Pet Survey 1")
-        psu.delete()
-
-    def test_creation_and_deletion_basic_survey(self):
-        surveys = several_long_surveys(f"Survey 1")
-        for survey in surveys:
-            survey.delete()
-
-    def test_creation_and_deletion_tight_surveys(self):
-        surveys = several_tight_surveys(f"Survey 1")
-        for survey in surveys:
-            survey.delete()
-
-    def test_create_answered_survey(self):
-        for i in range(3):
-            create_answered_survey()
-
-
-        
-        
-
-
-
-
+        assert(not shown_element.triggered(dep))

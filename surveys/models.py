@@ -58,12 +58,16 @@ class Section(Element):
     def questions(self):
         return self.question_set.all()
 
-    def triggered(self):
+    def triggered(self, department):
         # There are no dependencies, so trigger
         if not self.trigger_questions.all().count():
             return True
         # Trigger if there are any dependencies that match
-        return any(q.show() for q in self.trigger_questions.all())
+        questions = list(self.trigger_questions.all())
+        trigs = [q.show(department) for q in questions]
+        ret = any(trigs)
+        title = self.title
+        return ret
 
     def short_signifier(self):
         return 'section'
@@ -104,12 +108,18 @@ class Question(Element):
     def truncated_text(self):
         return Truncator(self.text).chars(30)
 
-    def triggered(self):
+    def triggered(self, department):
         # There are no dependencies, so trigger
         if not self.trigger_questions.all().count():
             return True
         # Trigger if there are any dependencies that match
-        return any(q.show() for q in self.trigger_questions.all())
+        if self.text.startswith('How many cats'):
+            import pdb
+        questions = list(self.trigger_questions.all())
+        trigs = [q.show(department) for q in questions]
+        ret = any(trigs)
+        title = self.truncated_text()
+        return ret
 
     def short_signifier(self):
         return 'question'
@@ -176,7 +186,7 @@ class Answer(models.Model):
 
 
 def generate_random_token():
-    return '-'.join(('COD', ''.join(
+    return '-'.join(('TKN', ''.join(
         random.choices(string.ascii_uppercase  + string.digits, k=4))))
 
     return get_random_string(length=32)
@@ -215,11 +225,18 @@ class DisplayByOptions(DisplayLogic):
 
     options = models.ManyToManyField(Option)
 
-    def show(self):
-        if self.trigger_question.answer_set.count() == 0:
+    def show(self, department):
+        if self.trigger_question.answer_set.filter(department=department).count() == 0:
             return False
-        intersection = self.trigger_question.answer_set.first().options.all().order_by().intersection(self.options.order_by().all())
-        return intersection.count()
+
+        # # debug
+        # size_tq_a_set = self.trigger_question.answer_set.filter(department=department).count()
+        # tq_as_all = list(self.trigger_question.answer_set.filter(department=department).first().options.all().order_by())
+        # my_options = list(self.options.order_by().all())
+
+        intersection = self.trigger_question.answer_set.filter(department=department).first().options.all().order_by().intersection(self.options.order_by().all())
+        hits = intersection.count()
+        return hits
 
     def __str__(self):
         return f"DiByOp q:{self.id}"
@@ -232,12 +249,12 @@ class DisplayByValue(DisplayLogic):
     value = models.CharField(max_length=100)
     condition = models.CharField(max_length=20, choices=SHOW_LOGIC_CHOICES, default="==")
 
-    def show(self):
-        if self.trigger_question.answer_set.count() == 0:
+    def show(self, department):
+        if self.trigger_question.answer_set.filter(department=department).count() == 0:
             return False
 
         try:
-            qq = self.trigger_question.answer_set.first()
+            qq = self.trigger_question.answer_set.filter(department=department).first()
             avalue = qq.value.text
         except AttributeError as e:
             return False

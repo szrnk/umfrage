@@ -208,7 +208,7 @@ class SectionAdmin(EditLinkToParentSurvey, PolymorphicInlineSupportMixin, admin.
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("name",)
     readonly_fields = ("survey", "survey_edit_link")
-    fieldsets = ((None, {"fields": ("survey", "survey_edit_link", "name", "title")}),)
+    fieldsets = ((None, {"fields": ("survey", "survey_edit_link", "name", "code", "title")}),)
     extra = 0
 
 
@@ -217,9 +217,10 @@ class SectionInline(
 ):
     model = Section
     extra = 0
-    exclude = ("code",)
     readonly_fields = ("edit_link",)
     formfield_overrides = FORMFIELD_OVERRIDES
+    fieldsets = ((None, {"fields": ("name", "code", "title", "edit_link")}),)
+
 
 
 class SurveyAdmin(admin.ModelAdmin):

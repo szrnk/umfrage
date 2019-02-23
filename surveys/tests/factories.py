@@ -371,9 +371,9 @@ def interest_survey(surveyname=None):
     OptionFactory(question=interested_in_ferrari, text=f"No")
 
     # Logic
-    int_in_animals_to_have_pets =\
+    int_in_animals_to_pet_section =\
         DisplayByOptionsFactory(shown_element=se_pe, trigger_question=int_in_animals)
-    int_in_animals_to_have_pets.options.add(int_yes)
+    int_in_animals_to_pet_section.options.add(int_yes)
 
     have_pets_to_which_pets =\
         DisplayByOptionsFactory(shown_element=which_pets, trigger_question=have_pets)
@@ -393,13 +393,16 @@ def interest_survey(surveyname=None):
     return su
 
 
-def create_invitations(survey, count):
-    for i in range(count):
-        dep = DepartmentFactory()
-        InvitationFactory(survey=survey, department=dep)
-
-
 def answer_question(qu, department):
+
+    def delete_preexisting_answers(question, dept):
+        # delete previous attempts at this question by this department
+        earlier = Answer.objects.filter(
+            question_id=question.pk, department_id=dept.pk
+        ).all()
+        for a in earlier:
+            a.delete()
+
     if qu.qtype in OPTION_CHOICES:
         oset = qu.option_set.all()
         oset = list(oset)
@@ -408,7 +411,10 @@ def answer_question(qu, department):
             options = [] if (len(oset) == 0) else random.sample(oset, 1 if (len(oset) <= 2) else len(oset)-1)
         else:
             options = [random.choice(oset)]
-        ans = AnswerFactory.create(question=qu, options=options, department=department)
+        delete_preexisting_answers(qu, department)
+        ans = Answer.objects.create(question=qu, department=department)
+        for option in options:
+            ans.options.add(option)
     elif qu.qtype in VALUE_CHOICES:
         helptxt = qu.help_text.split('//')
         if len(helptxt) > 1:
@@ -421,18 +427,37 @@ def answer_question(qu, department):
             vals = None
         if vals:
             val = random.choice(vals)
-            ans = AnswerFactory.create(question=qu, department=department)
+            delete_preexisting_answers(qu, department)
+            ans = Answer.objects.create(question=qu, department=department)
             ans.value = Value.objects.create(text=str(val))
             ans.save()
+    else:
+        ans = Answer.objects.none()
+    return ans
 
 
 def create_mock_answers(survey):
+    DEBUG = False
     for inv in survey.invitation_set.all():
         for se in survey.sections():
-            if se.triggered():
+            if se.triggered(inv.department):
+                if DEBUG: (f'TRIG SE {se.title}')
                 for qu in se.questions():
-                    if qu.triggered():
-                        answer_question(qu, inv.department)
+                    if qu.triggered(inv.department):
+                        if DEBUG: print(f'TRIG QU {qu.truncated_text()}')
+                        ans = answer_question(qu, inv.department)
+                        if DEBUG: print('A:', ans.question.truncated_text(), ans.value, ans.options.all())
+                    else:
+                        if DEBUG: print(f'NOTRIG QU {qu.truncated_text()}')
+
+            else:
+                if DEBUG: print(f'NOTRIG SE {se.title}')
+
+
+def create_invitations(survey, count):
+    for i in range(count):
+        dep = DepartmentFactory()
+        InvitationFactory(survey=survey, department=dep)
 
 
 def fake_survey_answers(survey, count):
@@ -443,5 +468,6 @@ def fake_survey_answers(survey, count):
 def create_answered_survey():
     ints = interest_survey(f"Answered Survey {datetime.now()}")
     fake_survey_answers(ints, 15)
+    return ints
 
 

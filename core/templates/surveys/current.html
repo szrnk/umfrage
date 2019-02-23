@@ -17,7 +17,8 @@
 
     <div id="accordion">
       {% for section in survey.sections %}
-        {% if section.triggered %}
+        {% is_element_triggered section as trigger_section %}
+        {% if trigger_section %}
           <div class="card">
             <div class="card-header" id="section_{{ section.id }}">
               <h5 class="mb-0">
@@ -47,7 +48,8 @@
                  data-parent="#accordion">
               <div class="card-body">
                 {% for question in section.questions %}
-                  {% if question.triggered %}
+                  {% is_element_triggered question as trigger_question %}
+                  {% if trigger_question %}
                     <div class="border rounded p-3" id="question_{{ question.id }}">
                       <form action="" method="post">
                         {% csrf_token %}
@@ -61,7 +63,7 @@
                               <div class="p-2">{% include "surveys/outbound_triggers.html" %}</div>
                             {% endwith %}
                             <div class="p-2"><a href="{% url 'admin:surveys_question_change' question.id %}" class="operator-notes">
-                      <img class="operator-icon" src="{% static 'images/round-edit-24px.svg' %}"/></a>
+                              <img class="operator-icon" src="{% static 'images/round-edit-24px.svg' %}"/></a>
                             </div>
                           {% endif %}
                         </div>
@@ -73,26 +75,6 @@
             </div>
           </div>
         {% elif request.user.is_superuser %}
-
-{#          <div class="card">#}
-{#            <div class="card-header" id="section_{{ section.id }}">#}
-{#              <h5 class="mb-0">#}
-{#                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"#}
-{#                        aria-expanded="true"#}
-{#                        aria-controls="collapseOne">#}
-{#                  {{ section.title }} - conditional#}
-{#                </button>#}
-{#              </h5>#}
-{#            </div>#}
-{#            <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}"#}
-{#                 data-parent="#accordion">#}
-{#              <div class="card-body">#}
-{#                {% for question in section.questions %}#}
-{#                  {{ question.text }}#}
-{#                {% endfor %}#}
-{#              </div>#}
-{#            </div>#}
-{#          </div>#}
 
         {% endif %}
 
