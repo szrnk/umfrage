@@ -5,6 +5,7 @@ argon2-cffi==18.1.0  # https://github.com/hynek/argon2_cffi
 redis>=2.10.6, < 3  # pyup: < 3 # https://github.com/antirez/redis
 selenium==3.141.0  # https://semaphoreci.com/community/tutorials/setting-up-a-bdd-stack-on-a-django-application
 zappa==0.47.1  # https://github.com/Miserlou/Zappa#installation-and-configuration
+tablib==0.12.1  # http://docs.python-tablib.org/en/master/tutorial/
 
 # Django
 # ------------------------------------------------------------------------------
