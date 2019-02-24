@@ -370,6 +370,13 @@ def interest_survey(surveyname=None):
     OptionFactory(question=interested_in_ferrari, text=f"Yes")
     OptionFactory(question=interested_in_ferrari, text=f"No")
 
+    favourite_car_brand = QuestionFactory(
+        parent_section=se_ms,
+        text=f"What is your favourite brand of car?",
+        help_text='//dict(test_values=["Toyota", "Mercedes Benz", "Jaguar"])',
+        qtype='TEXT'
+    )
+
     # Logic
     int_in_animals_to_pet_section =\
         DisplayByOptionsFactory(shown_element=se_pe, trigger_question=int_in_animals)
@@ -437,21 +444,12 @@ def answer_question(qu, department):
 
 
 def create_mock_answers(survey):
-    DEBUG = False
     for inv in survey.invitation_set.all():
         for se in survey.sections():
             if se.triggered(inv.department):
-                if DEBUG: (f'TRIG SE {se.title}')
                 for qu in se.questions():
                     if qu.triggered(inv.department):
-                        if DEBUG: print(f'TRIG QU {qu.truncated_text()}')
                         ans = answer_question(qu, inv.department)
-                        if DEBUG: print('A:', ans.question.truncated_text(), ans.value, ans.options.all())
-                    else:
-                        if DEBUG: print(f'NOTRIG QU {qu.truncated_text()}')
-
-            else:
-                if DEBUG: print(f'NOTRIG SE {se.title}')
 
 
 def create_invitations(survey, count):

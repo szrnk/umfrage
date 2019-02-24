@@ -1,0 +1,34 @@
+/*https://codepen.io/chriscoyier/pen/Fapif*/
+.table-header-rotated {
+  border-collapse: collapse;
+}
+.csstransforms .table-header-rotated td {
+  width: 30px;
+}
+.no-csstransforms .table-header-rotated th {
+  padding: 5px 10px;
+}
+.table-header-rotated td {
+  text-align: center;
+  padding: 10px 5px;
+  border: 1px solid #ccc;
+}
+.csstransforms .table-header-rotated th.rotate {
+  height: 180px;
+  white-space: nowrap;
+  font-size: xx-small;
+}
+.csstransforms .table-header-rotated th.rotate > div {
+  -webkit-transform: translate(10px, 71px) rotate(315deg);
+          transform: translate(10px, 71px) rotate(315deg);
+  width: 30px;
+}
+.csstransforms .table-header-rotated th.rotate > div > span {
+  /*border-bottom: 1px solid #ccc;*/
+  padding: 5px 10px;
+}
+.table-header-rotated th.row-header {
+  padding: 0 10px;
+  /*border-bottom: 1px solid #ccc;*/
+}
+

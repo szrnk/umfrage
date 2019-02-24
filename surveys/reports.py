@@ -1,6 +1,22 @@
 import tablib
+from pyquery import PyQuery as pq
 
 from surveys.models import Answer, OPTION_CHOICES
+
+
+def embellish_table(raw):
+    h = pq(raw)
+    h('table').add_class('table-header-rotated')
+    for i, el in enumerate(h('thead').find('th')):
+        if i < 4:
+            continue
+        text = el.text
+        new_h = pq(f'<th class="rotate"><div><span>{text}</span></div></th>')
+        pq(el).replace_with(new_h)
+    h('thead').find('th').attr.scope = 'col'
+    h('tbody').find('th').add_class('row-header')
+    h('tbody').find('th').attr.scope = 'row'
+    return str(h)
 
 
 def create_survey_output(survey):
@@ -32,9 +48,17 @@ def create_survey_output(survey):
                     col.append(ans.value.text)
                 else:
                     col.append('')
-        data.append_col(col, header=inv.department.name)
+        inst = ', '.join((inv.department.name, inv.department.hospital.name, inv.department.hospital.city))
+        data.append_col(col, header=inst)
+    return data
+
+
+def create_survey_html_output(survey):
+    data = create_survey_output(survey)
+    return embellish_table(data.html)
+
+
+def create_survey_csv(survey):
+    data = create_survey_output(survey)
     with open('temp.xls', 'wb') as f:
         f.write(data.xls)
-
-    # print(data.export('xls'))
-

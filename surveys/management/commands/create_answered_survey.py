@@ -7,7 +7,6 @@ class Command(BaseCommand):
     help = "Create answered surveys."
 
     def handle(self, *args, **options):
-        N = 5
-        for i in range(N):
-            create_answered_survey()
-        self.stdout.write(self.style.SUCCESS(f"Done - created {N}"))
+        N = 1
+        surveys = [create_answered_survey().id for i in range(N)]
+        self.stdout.write(self.style.SUCCESS(f"Done - created {N} - {surveys}"))

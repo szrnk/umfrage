@@ -5,10 +5,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
+from django.views.generic import TemplateView
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
 from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element, OPTION_CHOICES, VALUE_CHOICES
+from surveys.reports import create_survey_output, create_survey_html_output
+from pyquery import PyQuery as pq
 
 from .progress import Progress
 
@@ -184,3 +187,15 @@ class TriggerQuestionView(Select2QuerySetView):
             if self.q:
                 qs = qs.filter(text__istartswith=self.q)
         return qs
+
+
+class SurveyTableView(TemplateView):
+    template_name = "surveys/survey_summary_table.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        survey = get_object_or_404(Survey, pk=kwargs['pk'])
+        table = create_survey_html_output(survey)
+        context['survey'] = survey
+        context['table'] = table
+        return context

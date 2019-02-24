@@ -96,3 +96,6 @@ future:
 https://github.com/django-import-export/django-import-export
 https://medium.com/@hakibenita/how-to-add-custom-action-buttons-to-django-admin-8d266f5b0d41
 https://code.djangoproject.com/wiki/ModelInterNationalization
+http://books.agiliq.com/projects/django-admin-cookbook/en/latest/remove_delete_selected.html
+https://www.techiediaries.com/django-admin-add-list-actions/
+https://codepen.io/chriscoyier/pen/Fapif
