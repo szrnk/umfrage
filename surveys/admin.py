@@ -5,16 +5,14 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db import models
-from django.forms import Textarea, ModelForm, ModelChoiceField, CharField
-from django.conf.urls import url
+from django.forms import Textarea, ModelForm, ModelChoiceField
 from django.urls import reverse
-
-from polymorphic.admin import (PolymorphicParentModelAdmin, PolymorphicChildModelAdmin,
-    StackedPolymorphicInline, PolymorphicInlineSupportMixin, )
-
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
+from polymorphic.admin import (PolymorphicParentModelAdmin, PolymorphicChildModelAdmin,
+                               StackedPolymorphicInline, PolymorphicInlineSupportMixin, )
 
+from correspondents.models import Department
 from .models import Survey, Section, Question, Option, Invitation, Answer, DisplayLogic, DisplayByOptions, DisplayByValue
 
 FORMFIELD_OVERRIDES = {
@@ -89,7 +87,6 @@ class DisplayLogicChildAdmin(PolymorphicChildModelAdmin):
 
 
 class DisplayByOptionForm(ModelForm):
-
     class Meta:
         model = DisplayByOptions
         fields = ('__all__')
@@ -105,7 +102,6 @@ class DisplayByOptionForm(ModelForm):
 
 
 class DisplayByValueForm(ModelForm):
-
     class Meta:
         model = DisplayByValue
         fields = ('__all__')
@@ -131,7 +127,7 @@ class DisplayByValueAdmin(DisplayLogicChildAdmin):
 
 class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
     base_model = DisplayLogic  # Optional, explicitly set here.
-    child_models = (DisplayByOptions, DisplayByValue, )
+    child_models = (DisplayByOptions, DisplayByValue,)
 
 
 class DisplayLogicInline(StackedPolymorphicInline):
@@ -244,10 +240,21 @@ def get_invitation_url(obj):
     return mark_safe(u'<a href="{u}">set as current survey</a>'.format(u=obj.get_url()))
 
 
+class DepartmentChoiceField(ModelChoiceField):
+    def label_from_instance(self, department):
+        hospital = department.hospital
+        return f"Department {department.name} of Hospital {hospital.name}"
+
+
 class InvitationAdmin(admin.ModelAdmin):
     list_display = ("department", "survey", get_invitation_url)
     extra = 0
     readonly_fields = (get_invitation_url,)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'department':
+            return DepartmentChoiceField(queryset=Department.objects.all())
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(Answer)
@@ -259,7 +266,6 @@ admin.site.register(Survey, SurveyAdmin)
 admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
 admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
 admin.site.register(DisplayByValue, DisplayByValueAdmin)
-
 
 # TODO: We want a better place to put these unregisters...
 admin.site.unregister(Group)
