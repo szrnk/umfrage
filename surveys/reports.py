@@ -60,5 +60,6 @@ def create_survey_html_output(survey):
 
 def create_survey_csv(survey):
     data = create_survey_output(survey)
-    with open('temp.xls', 'wb') as f:
-        f.write(data.xls)
+    return data.csv
+    # with open('temp.csv', 'wb') as f:
+    #     f.write(data.csv)

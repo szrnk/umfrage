@@ -222,10 +222,17 @@ class SectionInline(
     fieldsets = ((None, {"fields": ("name", "code", "title", "edit_link")}),)
 
 
+def get_html_url(obj):
+    return mark_safe(u'<a href="{u}">view response</a>'.format(u=obj.get_html_table_url()))
+
+
+def get_csv_url(obj):
+    return mark_safe(u'<a href="{u}">download CSV</a>'.format(u=obj.get_csv_file_url()))
+
 
 class SurveyAdmin(admin.ModelAdmin):
     inlines = (SectionInline,)
-    list_display = ("name",)
+    list_display = ("name", get_html_url, get_csv_url)
     extra = 0
 
 

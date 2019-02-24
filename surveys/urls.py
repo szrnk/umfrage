@@ -8,6 +8,8 @@ urlpatterns = [
     path("", views.IndexView.as_view(), name="index"),
     path("<int:pk>/", views.DetailView.as_view(), name="detail"),
     path("<int:pk>/as_table", views.SurveyTableView.as_view(), name="table"),
+    path("<int:pk>/as_csv", views.survey_csv_file_view, name="csvfile"),
+
     path("invite/<str:token>", views.InvitationView.as_view(), name="invite"),
     path("current/", views.CurrentSurveyView.as_view(), name="current"),
     path("myinvitations/", views.MyInvitationsView.as_view(), name="myinvitations"),

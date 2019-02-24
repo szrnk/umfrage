@@ -23,6 +23,12 @@ class Survey(models.Model):
     def sections(self):
         return self.section_set.all()
 
+    def get_html_table_url(self):
+        return reverse("surveys:table", kwargs={"pk": self.pk})
+
+    def get_csv_file_url(self):
+        return reverse("surveys:csvfile", kwargs={"pk": self.pk})
+
 
 class Element(PolymorphicModel):
 

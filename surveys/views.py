@@ -1,7 +1,7 @@
 from dal_select2.views import Select2QuerySetView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 from correspondents.models import Department
 from surveys.forms import FlexiForm
 from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element, OPTION_CHOICES, VALUE_CHOICES
-from surveys.reports import create_survey_output, create_survey_html_output
+from surveys.reports import create_survey_output, create_survey_html_output, create_survey_csv
 from pyquery import PyQuery as pq
 
 from .progress import Progress
@@ -199,3 +199,12 @@ class SurveyTableView(TemplateView):
         context['survey'] = survey
         context['table'] = table
         return context
+
+
+def survey_csv_file_view(request, pk):
+    survey = get_object_or_404(Survey, pk=pk)
+    csv = create_survey_csv(survey)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{survey.name}.csv"'
+    response.write(csv)
+    return response
