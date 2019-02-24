@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 from correspondents.models import Department
 from surveys.forms import FlexiForm
 from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element, OPTION_CHOICES, VALUE_CHOICES
-from surveys.reports import create_survey_output, create_survey_html_output, create_survey_csv
+from surveys.reports import create_survey_output, create_survey_html_output, create_survey_csv, create_survey_xlsx
 from pyquery import PyQuery as pq
 
 from .progress import Progress
@@ -207,4 +207,13 @@ def survey_csv_file_view(request, pk):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename="{survey.name}.csv"'
     response.write(csv)
+    return response
+
+
+def survey_xlsx_file_view(request, pk):
+    survey = get_object_or_404(Survey, pk=pk)
+    xlsx = create_survey_xlsx(survey)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{survey.name}.xslx"'
+    response.write(xlsx)
     return response

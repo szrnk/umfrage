@@ -14,6 +14,5 @@ def test_first_report():
 
 def test_embellish():
     testdir = os.path.dirname(os.path.realpath(__file__))
-    h = open(os.path.join(testdiryes
-                          , 'report.html'), 'r').read()
+    h = open(os.path.join(testdir, 'report.html'), 'r').read()
     print(embellish_table(h))

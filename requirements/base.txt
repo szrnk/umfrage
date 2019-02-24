@@ -8,6 +8,10 @@ zappa==0.47.1  # https://github.com/Miserlou/Zappa#installation-and-configuratio
 tablib==0.12.1  # http://docs.python-tablib.org/en/master/tutorial/
 pyquery==1.4.0  # https://pythonhosted.org/pyquery/manipulating.html
 
+# dep of tablib. Pinning due to ...
+#  https://stackoverflow.com/questions/48598092/python-3-5-3-6-tablib-typeerror-cell-missing-1-required-positional-argumen
+openpyxl==2.4.9
+
 # Django
 # ------------------------------------------------------------------------------
 django==2.0.9  # pyup: < 2.1  # https://www.djangoproject.com/

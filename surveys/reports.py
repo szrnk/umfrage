@@ -8,7 +8,7 @@ def embellish_table(raw):
     h = pq(raw)
     h('table').add_class('table-header-rotated')
     for i, el in enumerate(h('thead').find('th')):
-        if i < 4:
+        if i < 5:
             continue
         text = el.text
         new_h = pq(f'<th class="rotate"><div><span>{text}</span></div></th>')
@@ -25,10 +25,10 @@ def create_survey_output(survey):
         for qu in se.questions():
             if qu.qtype in OPTION_CHOICES:
                 for op in qu.options().all():
-                    data.append([se.code, qu.code, op.code, op.text])
+                    data.append([se.code, qu.code, qu.text, op.code, op.text])
             else:
-                data.append([se.code, qu.code, 'V', '-'])
-    data.headers = ['Section', 'Question', 'Op/Val', 'text']
+                data.append([se.code, qu.code, qu.text, 'V', '-'])
+    data.headers = ['Se-Code', 'Qu-code', 'Question', 'Op/Val', 'Option']
     for inv in survey.invitation_set.all():
         col = []
         for se in survey.sections():
@@ -61,5 +61,8 @@ def create_survey_html_output(survey):
 def create_survey_csv(survey):
     data = create_survey_output(survey)
     return data.csv
-    # with open('temp.csv', 'wb') as f:
-    #     f.write(data.csv)
+
+
+def create_survey_xlsx(survey):
+    data = create_survey_output(survey)
+    return data.xlsx

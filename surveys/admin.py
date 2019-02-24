@@ -227,12 +227,16 @@ def get_html_url(obj):
 
 
 def get_csv_url(obj):
-    return mark_safe(u'<a href="{u}">download CSV</a>'.format(u=obj.get_csv_file_url()))
+    return mark_safe(u'<a href="{u}">download CSV file</a>'.format(u=obj.get_csv_file_url()))
+
+
+def get_xslx_url(obj):
+    return mark_safe(u'<a href="{u}">download XLSX file</a>'.format(u=obj.get_xslx_file_url()))
 
 
 class SurveyAdmin(admin.ModelAdmin):
     inlines = (SectionInline,)
-    list_display = ("name", get_html_url, get_csv_url)
+    list_display = ("name", get_html_url, get_csv_url, get_xslx_url)
     extra = 0
 
 

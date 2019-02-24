@@ -29,6 +29,9 @@ class Survey(models.Model):
     def get_csv_file_url(self):
         return reverse("surveys:csvfile", kwargs={"pk": self.pk})
 
+    def get_xslx_file_url(self):
+        return reverse("surveys:xlsxfile", kwargs={"pk": self.pk})
+
 
 class Element(PolymorphicModel):
 
