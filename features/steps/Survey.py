@@ -6,7 +6,7 @@ from core.users.tests.factories import AdminFactory
 from correspondents.models import Hospital, Department
 from correspondents.tests.factories import basic_hospital_structure
 from surveys.models import Survey, Invitation
-from surveys.tests.factories import tight_survey_structure
+from surveys.tests.factories import several_tight_surveys
 
 use_step_matcher("parse")
 
@@ -119,7 +119,7 @@ def step_impl(context, surveyname):
     """
     ss = Survey.objects.filter(name=surveyname)
     if not ss:
-        tight_survey_structure(surveyname=surveyname)
+        several_tight_surveys(surveyname=surveyname)
     ss = Survey.objects.filter(name=surveyname)
     assert ss
 
@@ -321,7 +321,7 @@ def step_impl(context, surveyname):
     assert len(els) == 0
     els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//input[@type='radio']")
     assert len(els) == 0
-    els = br.find_elements_by_xpath("//div[@id='question_3']//form//option")
+    els = br.find_elements_by_xpath(f"//div[@id='question_{question.id}']//form//option")
     assert len(els) == 4
     assert all([el.text.startswith('text') for el in els])
 

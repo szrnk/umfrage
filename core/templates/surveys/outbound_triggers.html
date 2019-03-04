@@ -1,0 +1,10 @@
+{% load static %}
+
+{% if element.shown_element.count %}
+  <a href="#" class="operator-notes" data-html="true" data-toggle="tooltip" data-placement="top"
+     title="Triggers<br> {% for se in element.outbound_triggers %}
+     {{ se.code }} {{ se.text }}{% if not forloop.last %},<br>{% endif %}{% endfor %}">
+    <img class="operator-icon" src="{% static 'images/round-subdirectory_arrow_right-24px.svg' %}"/>
+
+  </a>
+{% endif %}

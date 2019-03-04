@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load survey_extras %}
 {% load crispy_forms_tags %}
+{% load static %}
+
 
 {% block content %}
   {% if not survey %}
@@ -11,39 +13,70 @@
   {% else %}
 
     <h2>Survey: {{ survey.name }}</h2>
-    <h3>Department: {{ department.name }} of Hospital: {{ department.hospital }}</h3>
+    <h3>{{ department.name }} - {{ department.hospital }}</h3>
 
     <div id="accordion">
       {% for section in survey.sections %}
-        <div class="card">
-          <div class="card-header" id="section_{{ section.id }}">
-            <h5 class="mb-0">
-              <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="true"
-                      aria-controls="collapseOne">
-                {{ section.title }}
-              </button>
-            </h5>
-          </div>
-          <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}" data-parent="#accordion">
-            <div class="card-body">
-              {% for question in section.questions %}
-                {% if question.triggered %}
-                  <div id="question_{{ question.id }}">
-                    <form action="" method="post">
-                      {% csrf_token %}
-                      {% get_survey_question_form survey department question as the_form %}
-                      {{ the_form | crispy }}
-                      <input class="btn btn-primary btn-sm" type="submit" value="Submit">
-                      {% if request.user.is_superuser %}
-                        <a href="{% url 'admin:surveys_question_change' question.id %}">Edit question</a>
-                      {% endif %}
-                    </form>
+        {% is_element_triggered section as trigger_section %}
+        {% if trigger_section %}
+          <div class="card">
+            <div class="card-header" id="section_{{ section.id }}">
+              <h5 class="mb-0">
+                <div class="d-flex">
+                  <div class="mr-auto p-2">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
+                            aria-expanded="true"
+                            aria-controls="collapseOne">
+                      {{ section.title }}
+                    </button>
                   </div>
-                {% endif %}
-              {% endfor %}
+                  {% if request.user.is_superuser %}
+                    {% with element=section %}
+                      <div class="p-2">
+                        {% include "surveys/inbound_triggers.html" %}
+                      </div>
+                    {% endwith %}
+                    <div class="p-2"><a href="{% url 'admin:surveys_section_change' section.id %}" class="operator-notes">
+                      <img class="operator-icon" src="{% static 'images/round-edit-24px.svg' %}"/></a>
+                    </div>
+                  {% endif %}
+
+                </div>
+              </h5>
+            </div>
+            <div id="collapse{{ forloop.counter }}" class="collapse show" aria-labelledby="section{{ section.id }}"
+                 data-parent="#accordion">
+              <div class="card-body">
+                {% for question in section.questions %}
+                  {% is_element_triggered question as trigger_question %}
+                  {% if trigger_question %}
+                    <div class="border rounded p-3" id="question_{{ question.id }}">
+                      <form action="" method="post">
+                        {% csrf_token %}
+                        {% get_survey_question_form survey department question as the_form %}
+                        {{ the_form | crispy }}
+                        <div class="d-flex">
+                          <div class="mr-auto p-2"><input class="btn btn-primary btn-sm" type="submit" value="Submit"></div>
+                          {% if request.user.is_superuser %}
+                            {% with element=question %}
+                              <div class="p-2">{% include "surveys/inbound_triggers.html" %}</div>
+                              <div class="p-2">{% include "surveys/outbound_triggers.html" %}</div>
+                            {% endwith %}
+                            <div class="p-2"><a href="{% url 'admin:surveys_question_change' question.id %}" class="operator-notes">
+                              <img class="operator-icon" src="{% static 'images/round-edit-24px.svg' %}"/></a>
+                            </div>
+                          {% endif %}
+                        </div>
+                      </form>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
             </div>
           </div>
-        </div>
+        {% elif request.user.is_superuser %}
+
+        {% endif %}
 
       {% endfor %}
     </div>

@@ -1,14 +1,17 @@
+from dal_select2.views import Select2QuerySetView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
-from django.views.generic.edit import FormMixin
+from django.views.generic import TemplateView
 
 from correspondents.models import Department
 from surveys.forms import FlexiForm
-from surveys.models import Survey, Section, Invitation, Option, Answer, Question
+from surveys.models import Survey, Section, Invitation, Option, Answer, Question, Element, OPTION_CHOICES, VALUE_CHOICES
+from surveys.reports import create_survey_output, create_survey_html_output, create_survey_csv, create_survey_xlsx
+from pyquery import PyQuery as pq
 
 from .progress import Progress
 
@@ -141,13 +144,76 @@ class CurrentSurveyView(LoginRequiredMixin, generic.DetailView):
         form.save()
         return HttpResponseRedirect(self.get_success_url())
 
-    # def form_invalid(self, form):
-    #     """If the form is invalid, render the invalid form."""
-    #     return self.render_to_response(self.get_context_data(form=form))
-
 
 class MyInvitationsView(generic.ListView):
     template_name = "surveys/myinvitations.html"
 
     def get_queryset(self):
         return self.request.user.invitations.all()
+
+
+class LinkedOptionsView(Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return Option.objects.none()
+        trigger_question = self.forwarded.get('trigger_question', None)
+        qs = Option.objects.all()
+        if trigger_question:
+            qs = qs.filter(question_id=trigger_question)
+        return qs
+
+
+class TriggerQuestionView(Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return Question.objects.none()
+        shown_element = self.forwarded.get('shown_element', None)
+        qs = Element.objects.none()
+        if shown_element:
+            shown_element = int(shown_element)
+            question = Question.objects.filter(id=shown_element).first()
+            if question is not None:
+                survey = question.parent_section.survey
+            else:
+                section = Section.objects.filter(id=shown_element).first()
+                survey = section.survey
+            question_type = self.kwargs.get('type', None)
+            qs = Question.objects.filter(parent_section__survey__exact=survey.id)
+            if question_type == 'options':
+                qs = qs.filter(qtype__in=OPTION_CHOICES)
+            elif question_type == 'value':
+                qs = qs.filter(qtype__in=VALUE_CHOICES)
+            qs.exclude(id__in=[shown_element])
+            if self.q:
+                qs = qs.filter(text__istartswith=self.q)
+        return qs
+
+
+class SurveyTableView(TemplateView):
+    template_name = "surveys/survey_summary_table.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        survey = get_object_or_404(Survey, pk=kwargs['pk'])
+        table = create_survey_html_output(survey)
+        context['survey'] = survey
+        context['table'] = table
+        return context
+
+
+def survey_csv_file_view(request, pk):
+    survey = get_object_or_404(Survey, pk=pk)
+    csv = create_survey_csv(survey)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{survey.name}.csv"'
+    response.write(csv)
+    return response
+
+
+def survey_xlsx_file_view(request, pk):
+    survey = get_object_or_404(Survey, pk=pk)
+    xlsx = create_survey_xlsx(survey)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{survey.name}.xslx"'
+    response.write(xlsx)
+    return response

@@ -4,6 +4,11 @@ Base settings to build other settings files upon.
 
 import environ
 
+print('#'*60)
+print('BASE config')
+print('#'*60)
+
+
 ROOT_DIR = environ.Path(__file__) - 3  # (core/config/settings/base.py - 3 = core/)
 APPS_DIR = ROOT_DIR.path('core')
 
@@ -61,6 +66,11 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
     'polymorphic',
     # 'django.contrib.humanize', # Handy template tags
+
+    # These must be before admin
+    'dal',
+    'dal_select2',
+
     'django.contrib.admin',
 ]
 THIRD_PARTY_APPS = [

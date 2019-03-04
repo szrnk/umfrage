@@ -1,3 +1,6 @@
+import random
+import string
+
 from django.db import models
 from django.urls import reverse
 from django.utils.crypto import get_random_string
@@ -9,7 +12,7 @@ from .managers import QuestionQuerySet
 
 
 class Survey(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50)
 
     class Meta:
         ordering = ["-name"]
@@ -20,9 +23,34 @@ class Survey(models.Model):
     def sections(self):
         return self.section_set.all()
 
+    def get_html_table_url(self):
+        return reverse("surveys:table", kwargs={"pk": self.pk})
 
-class Section(models.Model):
+    def get_csv_file_url(self):
+        return reverse("surveys:csvfile", kwargs={"pk": self.pk})
+
+    def get_xslx_file_url(self):
+        return reverse("surveys:xlsxfile", kwargs={"pk": self.pk})
+
+
+class Element(PolymorphicModel):
+
+    def short_signifier(self):
+        return 'element'
+
+    def inbound_triggers(self):
+        return ""
+
+    def outbound_triggers(self):
+        return ""
+
+    def __str__(self):
+        return f"E: {self.id}"
+
+
+class Section(Element):
     survey = models.ForeignKey(Survey, on_delete=models.CASCADE)
+    code = models.CharField(max_length=40)
     # Name is for the survey developer only
     name = models.CharField(max_length=100)
     # Title is used on frontend - and to be internationalised
@@ -39,22 +67,46 @@ class Section(models.Model):
     def questions(self):
         return self.question_set.all()
 
+    def triggered(self, department):
+        # There are no dependencies, so trigger
+        if not self.trigger_questions.all().count():
+            return True
+        # Trigger if there are any dependencies that match
+        questions = list(self.trigger_questions.all())
+        trigs = [q.show(department) for q in questions]
+        ret = any(trigs)
+        title = self.title
+        return ret
+
+    def short_signifier(self):
+        return 'section'
+
+    def inbound_triggers(self):
+        ret = []
+        for tq in self.trigger_questions.all():
+            code = tq.trigger_question.code
+            text = tq.trigger_question.truncated_text()
+            ret += [dict(code=code, text=text)]
+        return ret
+
     def number_of_questions(self):
         return len(self.questions())
 
 
 TYPE_CHOICES = (("SINGLECHOICE", "Radio"), ("MULTICHOICE", "Checkboxes"), ("SELECT", "Select (Dropdown)"), ("TEXT", "Text"),
                 ("ESSAY", "Essay"), ("INTEGER", "Integer"), ("EMAIL", "Email"),)
+OPTION_CHOICES = ["SINGLECHOICE", "MULTICHOICE", "SELECT"]
+VALUE_CHOICES = ["TEXT", "ESSAY", "INTEGER", "EMAIL"]
 
 
-class Question(models.Model):
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+class Question(Element):
+    parent_section = models.ForeignKey(Section, on_delete=models.CASCADE)
     code = models.CharField(max_length=40)
     text = models.TextField(blank=True)
     help_text = models.TextField(blank=True)
     qtype = models.CharField(max_length=20, choices=TYPE_CHOICES, default="SINGLECHOICE")
     order = models.PositiveIntegerField(default=0, blank=False, null=False)
-    objects = QuestionQuerySet.as_manager()
+    objects = QuestionQuerySet()
 
     def options(self):
         return self.option_set.all()
@@ -65,19 +117,47 @@ class Question(models.Model):
     def truncated_text(self):
         return Truncator(self.text).chars(30)
 
-    def triggered(self):
+    def triggered(self, department):
         # There are no dependencies, so trigger
         if not self.trigger_questions.all().count():
             return True
         # Trigger if there are any dependencies that match
-        return any(q.show() for q in self.trigger_questions.all())
+        if self.text.startswith('How many cats'):
+            import pdb
+        questions = list(self.trigger_questions.all())
+        trigs = [q.show(department) for q in questions]
+        ret = any(trigs)
+        title = self.truncated_text()
+        return ret
+
+    def short_signifier(self):
+        return 'question'
+
+    def inbound_triggers(self):
+        ret = []
+        for tq in self.trigger_questions.all():
+            code = tq.trigger_question.code
+            text = tq.trigger_question.truncated_text()
+            ret += [dict(code=code, text=text)]
+        return ret
+
+    def outbound_triggers(self):
+        ret = []
+        for se in self.shown_element.all():
+            code = se.shown_element.code
+            if hasattr(se.shown_element, 'truncated_text'):
+                text = se.shown_element.truncated_text()
+            else:
+                text = se.shown_element.title
+            ret += [dict(code=code, text=text)]
+        return ret
 
     class Meta:
         # order must be first
         ordering = ["order"]
 
     def __str__(self):
-        return self.truncated_text()
+        return f'Q: {self.truncated_text()}'
 
 
 class Option(models.Model):
@@ -91,7 +171,8 @@ class Option(models.Model):
         ordering = ["order"]
 
     def __str__(self):
-        return f'Su:{self.question.section.survey.id} Se: {self.question.section.id} Q:{self.question.id} O:{self.id} ' + Truncator(self.text).chars(20)
+        code = f"<{self.code}>: " if self.code else ''
+        return code + Truncator(self.text).chars(20)
 
 
 class Value(models.Model):
@@ -112,11 +193,11 @@ class Answer(models.Model):
     def __str__(self):
         return f"<Answer {self.id}>"
 
-    # def __repr__(self):
-    #     return f"<Answer {self.pk}> option:{self.option} for {self.question} for {self.department}"
-
 
 def generate_random_token():
+    return '-'.join(('TKN', ''.join(
+        random.choices(string.ascii_uppercase  + string.digits, k=4))))
+
     return get_random_string(length=32)
 
 
@@ -132,23 +213,42 @@ class Invitation(models.Model):
         return reverse("surveys:invite", kwargs={"token": self.token})
 
 
+def NON_POLYMORPHIC_CASCADE(collector, field, sub_objs, using):
+    """
+    https://github.com/django-polymorphic/django-polymorphic/issues/229#issuecomment-398434412
+    """
+    return models.CASCADE(collector, field, sub_objs.non_polymorphic(), using)
+
+
 class DisplayLogic(PolymorphicModel):
-    shown_question = models.ForeignKey('Question', related_name='trigger_questions', null=True, on_delete=models.CASCADE)
-    trigger_question = models.ForeignKey('Question',  related_name='shown_question', null=True, on_delete=models.CASCADE)
+    shown_element = models.ForeignKey('Element', related_name='trigger_questions', null=True,
+                                       on_delete=NON_POLYMORPHIC_CASCADE)
+    trigger_question = models.ForeignKey('Question',  related_name='shown_element', null=True,
+                                         on_delete=NON_POLYMORPHIC_CASCADE)
 
     def __str__(self):
-        return f"DiLog {self.trigger_question.id} triggers {self.shown_question.id}"
+        return f"DiLog q:{self.trigger_question.id} triggers {self.shown_element.short_signifier()[0]}:{self.shown_element.id}"
 
 
 class DisplayByOptions(DisplayLogic):
 
     options = models.ManyToManyField(Option)
 
-    def show(self):
-        if self.trigger_question.answer_set.count() == 0:
+    def show(self, department):
+        if self.trigger_question.answer_set.filter(department=department).count() == 0:
             return False
-        intersection = self.trigger_question.answer_set.first().options.all().intersection(self.options.all())
-        return intersection.count()
+
+        # # debug
+        # size_tq_a_set = self.trigger_question.answer_set.filter(department=department).count()
+        # tq_as_all = list(self.trigger_question.answer_set.filter(department=department).first().options.all().order_by())
+        # my_options = list(self.options.order_by().all())
+
+        intersection = self.trigger_question.answer_set.filter(department=department).first().options.all().order_by().intersection(self.options.order_by().all())
+        hits = intersection.count()
+        return hits
+
+    def __str__(self):
+        return f"DiByOp q:{self.id}"
 
 
 SHOW_LOGIC_CHOICES = (("==", "=="), (">=", ">="), ("<=", "<="), ("contains", "contains"), ("containsNoCase", "containsNoCase"), )
@@ -158,11 +258,15 @@ class DisplayByValue(DisplayLogic):
     value = models.CharField(max_length=100)
     condition = models.CharField(max_length=20, choices=SHOW_LOGIC_CHOICES, default="==")
 
-    def show(self):
-        if self.trigger_question.answer_set.count() == 0:
+    def show(self, department):
+        if self.trigger_question.answer_set.filter(department=department).count() == 0:
             return False
 
-        avalue = self.trigger_question.answer_set.first().value.text
+        try:
+            qq = self.trigger_question.answer_set.filter(department=department).first()
+            avalue = qq.value.text
+        except AttributeError as e:
+            return False
 
         if self.condition == '==':
             if avalue == self.value:
@@ -181,6 +285,8 @@ class DisplayByValue(DisplayLogic):
                 return True
         return False
 
+    def __str__(self):
+        return f"DiByVal q:{self.id}"
 
 
 

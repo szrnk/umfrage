@@ -75,6 +75,8 @@ The following details how to deploy this application.
 
 zappa update
 
+important to ensure VPC endpoint created for s3 fetch
+
 Test Data
 ---------
 
@@ -86,3 +88,14 @@ References
 ^^^^^^^^^^
 
 https://simpleisbetterthancomplex.com/tutorial/2018/11/28/advanced-form-rendering-with-django-crispy-forms.html
+
+https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/authentication-authrization.html#mutual
+
+future:
+
+https://github.com/django-import-export/django-import-export
+https://medium.com/@hakibenita/how-to-add-custom-action-buttons-to-django-admin-8d266f5b0d41
+https://code.djangoproject.com/wiki/ModelInterNationalization
+http://books.agiliq.com/projects/django-admin-cookbook/en/latest/remove_delete_selected.html
+https://www.techiediaries.com/django-admin-add-list-actions/
+https://codepen.io/chriscoyier/pen/Fapif

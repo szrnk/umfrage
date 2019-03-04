@@ -7,25 +7,20 @@ from django.views import defaults as default_views
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path(
-        "about/",
-        TemplateView.as_view(template_name="pages/about.html"),
-        name="about",
-    ),
+    path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about",),
+
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
+
     # User management
-    path(
-        "users/",
-        include("core.users.urls", namespace="users"),
-    ),
+    path("users/", include("core.users.urls", namespace="users"),),
     path("accounts/", include("allauth.urls")),
+
     # Your stuff: custom urls includes go here
     path('surveys/', include('surveys.urls', namespace="surveys")),
     path('correspondents/', include('correspondents.urls', namespace="correspondents")),
-    ] + static(
-    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-    )
+    ] + \
+    static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit

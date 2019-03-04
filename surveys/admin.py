@@ -1,17 +1,18 @@
 from adminsortable2.admin import SortableInlineAdminMixin
 from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
+from dal_select2.widgets import ModelSelect2, ModelSelect2Multiple
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db import models
-from django.forms import Textarea
+from django.forms import Textarea, ModelForm, ModelChoiceField
 from django.urls import reverse
-from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin, PolymorphicChildModelFilter, \
-    StackedPolymorphicInline, PolymorphicInlineSupportMixin
-
 # https://stackoverflow.com/questions/14308050/django-admin-nested-inline
 from django.utils.safestring import mark_safe
+from polymorphic.admin import (PolymorphicParentModelAdmin, PolymorphicChildModelAdmin,
+                               StackedPolymorphicInline, PolymorphicInlineSupportMixin, )
 
+from correspondents.models import Department
 from .models import Survey, Section, Question, Option, Invitation, Answer, DisplayLogic, DisplayByOptions, DisplayByValue
 
 FORMFIELD_OVERRIDES = {
@@ -32,8 +33,8 @@ class EditLinkToParentSection(object):
         if instance.pk:
             url = reverse(
                 "admin:%s_%s_change"
-                % (instance._meta.app_label, instance.section._meta.model_name),
-                args=[instance.section.pk],
+                % (instance._meta.app_label, instance.parent_section._meta.model_name),
+                args=[instance.parent_section.pk],
             )
             return mark_safe(u'<a href="{u}">edit parent section</a>'.format(u=url))
         else:
@@ -85,17 +86,48 @@ class DisplayLogicChildAdmin(PolymorphicChildModelAdmin):
     # )
 
 
+class DisplayByOptionForm(ModelForm):
+    class Meta:
+        model = DisplayByOptions
+        fields = ('__all__')
+        widgets = {
+            'trigger_question': ModelSelect2(url='/surveys/trigger_questions_options', forward=['shown_element']),
+            'options': ModelSelect2Multiple(url='/surveys/linked_options', forward=['trigger_question'])
+        }
+
+    class Media:
+        js = (
+            'linked_data.js',
+        )
+
+
+class DisplayByValueForm(ModelForm):
+    class Meta:
+        model = DisplayByValue
+        fields = ('__all__')
+        widgets = {
+            'trigger_question': ModelSelect2(url='/surveys/trigger_questions_value', forward=['shown_element']),
+        }
+
+    class Media:
+        js = (
+            'linked_data.js',
+        )
+
+
 class DisplayByOptionsAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByOptions
+    form = DisplayByOptionForm
 
 
 class DisplayByValueAdmin(DisplayLogicChildAdmin):
     base_model = DisplayByValue
+    form = DisplayByValueForm
 
 
 class DisplayLogicParentAdmin(PolymorphicParentModelAdmin):
     base_model = DisplayLogic  # Optional, explicitly set here.
-    child_models = (DisplayByOptions, DisplayByValue, )
+    child_models = (DisplayByOptions, DisplayByValue,)
 
 
 class DisplayLogicInline(StackedPolymorphicInline):
@@ -104,14 +136,37 @@ class DisplayLogicInline(StackedPolymorphicInline):
     The actual form appearance of each row is determined by
     the child inline that corresponds with the actual model type.
     """
+    verbose_name_plural = 'Display Conditions'
+    verbose_name = 'Display Condition'
+
+    def __init__(self, parent_model, admin_site):
+        super().__init__(parent_model, admin_site)
+        if self.parent_model == Question:
+            self.verbose_name_plural = self.verbose_name_plural + ' for this Question'
+            self.verbose_name = self.verbose_name + ' for this Question'
+        if self.parent_model == Section:
+            self.verbose_name_plural = self.verbose_name_plural + ' for this Section'
+            self.verbose_name = self.verbose_name + ' for this Section'
+
     class DisplayByValueAdminInline(StackedPolymorphicInline.Child):
         model = DisplayByValue
+        form = DisplayByValueForm
 
     class DisplayByOptionAdminInline(StackedPolymorphicInline.Child):
         model = DisplayByOptions
+        form = DisplayByOptionForm
+
+        class Meta:
+            model = DisplayByOptions
+            fields = ('trigger_question', 'options')
+
+        class Media:
+            js = (
+                'linked_data.js',
+            )
 
     model = DisplayLogic
-    fk_name = 'shown_question'
+    fk_name = 'shown_element'
     child_inlines = (
         DisplayByValueAdminInline,
         DisplayByOptionAdminInline,
@@ -128,9 +183,8 @@ class QuestionAdmin(EditLinkToParentSection, PolymorphicInlineSupportMixin, admi
     inlines = [OptionInline, DisplayLogicInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("code", "truncated_text")
-    # exclude = ('order', )
-    readonly_fields = ("section", "section_edit_link")
-    fieldsets = ((None, {"fields": ("section", "section_edit_link", "code", "text", "help_text", "qtype")}),)
+    readonly_fields = ("parent_section", "section_edit_link")
+    fieldsets = ((None, {"fields": ("parent_section", "section_edit_link", "code", "text", "help_text", "qtype")}),)
     extra = 0
 
 
@@ -138,18 +192,19 @@ class QuestionInline(
     SortableInlineAdminMixin, EditLinkToInlineObject, admin.StackedInline
 ):
     model = Question
+    fk_name = "parent_section"
     extra = 0
     exclude = ("code",)
     readonly_fields = ("edit_link",)
     formfield_overrides = FORMFIELD_OVERRIDES
 
 
-class SectionAdmin(EditLinkToParentSurvey, admin.ModelAdmin):
-    inlines = [QuestionInline]
+class SectionAdmin(EditLinkToParentSurvey, PolymorphicInlineSupportMixin, admin.ModelAdmin):
+    inlines = [QuestionInline, DisplayLogicInline]
     formfield_overrides = FORMFIELD_OVERRIDES
     list_display = ("name",)
     readonly_fields = ("survey", "survey_edit_link")
-    fieldsets = ((None, {"fields": ("survey", "survey_edit_link", "name", "title")}),)
+    fieldsets = ((None, {"fields": ("survey", "survey_edit_link", "name", "code", "title")}),)
     extra = 0
 
 
@@ -158,14 +213,26 @@ class SectionInline(
 ):
     model = Section
     extra = 0
-    exclude = ("code",)
     readonly_fields = ("edit_link",)
     formfield_overrides = FORMFIELD_OVERRIDES
+    fieldsets = ((None, {"fields": ("name", "code", "title", "edit_link")}),)
+
+
+def get_html_url(obj):
+    return mark_safe(u'<a href="{u}">view response</a>'.format(u=obj.get_html_table_url()))
+
+
+def get_csv_url(obj):
+    return mark_safe(u'<a href="{u}">download CSV file</a>'.format(u=obj.get_csv_file_url()))
+
+
+def get_xslx_url(obj):
+    return mark_safe(u'<a href="{u}">download XLSX file</a>'.format(u=obj.get_xslx_file_url()))
 
 
 class SurveyAdmin(admin.ModelAdmin):
     inlines = (SectionInline,)
-    list_display = ("name",)
+    list_display = ("name", get_html_url, get_csv_url, get_xslx_url)
     extra = 0
 
 
@@ -173,10 +240,21 @@ def get_invitation_url(obj):
     return mark_safe(u'<a href="{u}">set as current survey</a>'.format(u=obj.get_url()))
 
 
+class DepartmentChoiceField(ModelChoiceField):
+    def label_from_instance(self, department):
+        hospital = department.hospital
+        return f"Department {department.name} of Hospital {hospital.name}"
+
+
 class InvitationAdmin(admin.ModelAdmin):
     list_display = ("department", "survey", get_invitation_url)
     extra = 0
     readonly_fields = (get_invitation_url,)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'department':
+            return DepartmentChoiceField(queryset=Department.objects.all())
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 admin.site.register(Answer)
@@ -188,7 +266,6 @@ admin.site.register(Survey, SurveyAdmin)
 admin.site.register(DisplayLogic, DisplayLogicParentAdmin)
 admin.site.register(DisplayByOptions, DisplayByOptionsAdmin)
 admin.site.register(DisplayByValue, DisplayByValueAdmin)
-
 
 # TODO: We want a better place to put these unregisters...
 admin.site.unregister(Group)

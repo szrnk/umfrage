@@ -1,0 +1,9 @@
+{% load static %}
+
+{% if element.trigger_questions.count %}
+  <a href="#" class="operator-notes" data-html="true" data-toggle="tooltip" data-placement="top"
+     title="Triggered by <br> {% for tq in element.inbound_triggers %}
+     {{ tq.code }} {{ tq.text }}{% if not forloop.last %},<br>{% endif %}{% endfor %}">
+    <img class="operator-icon" src="{% static 'images/round-subdirectory_arrow_left-24px.svg' %}"/>
+  </a>
+{% endif %}

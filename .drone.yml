@@ -1,0 +1,17 @@
+pipeline:
+  build:
+    image: python:3.6.8
+    environment:
+      - DATABASE_URL=postgres://postgres@localhost
+    commands:
+      - pip3 install -r requirements/base.txt
+      - python ./manage.py test
+      - cd ..
+    when:
+      branch: [ master ]
+      event: [push, pull_request] # trigger step on push and pull events
+services:
+  database:
+    image: postgres
+    environment:
+      - DATABASE_URL=postgres://postgres@localhost
